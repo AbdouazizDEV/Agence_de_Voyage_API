@@ -31,8 +31,9 @@ async function loadApp() {
         allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
       });
       
-      // Préfixe global
-      app.setGlobalPrefix('api');
+      // Préfixe global - PAS de préfixe pour Vercel car les rewrites gèrent déjà /api
+      // Les routes seront accessibles directement sans double préfixe
+      // app.setGlobalPrefix('api'); // Désactivé pour Vercel
       
       // Versioning
       const { VersioningType } = require('@nestjs/common');
@@ -90,10 +91,23 @@ async function loadApp() {
 
 module.exports = async (req, res) => {
   try {
+    // Ajuster l'URL pour NestJS
+    // Vercel passe /api/docs mais NestJS attend /api/docs (avec préfixe)
+    // Comme on a désactivé le préfixe global, on doit ajouter /api manuellement
+    const originalUrl = req.url;
+    
+    // Si l'URL ne commence pas par /api, l'ajouter
+    if (!originalUrl.startsWith('/api')) {
+      req.url = '/api' + originalUrl;
+    }
+    
     const handler = await loadApp();
-    return handler(req, res);
+    
+    // Utiliser l'handler Express directement
+    handler(req, res);
   } catch (error) {
     console.error('❌ Erreur dans le handler:', error);
+    console.error('Stack:', error.stack);
     if (!res.headersSent) {
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');

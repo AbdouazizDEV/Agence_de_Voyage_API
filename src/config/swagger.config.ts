@@ -86,7 +86,9 @@ export function setupSwagger(app: INestApplication): void {
       `${controllerKey}_${methodKey}`,
   });
 
-  SwaggerModule.setup('api/docs', app, document, {
+  // Pour Vercel, le chemin doit être 'docs' car le préfixe 'api' est déjà géré
+  const swaggerPath = process.env.VERCEL ? 'docs' : 'api/docs';
+  SwaggerModule.setup(swaggerPath, app, document, {
     swaggerOptions: {
       persistAuthorization: true,
       docExpansion: 'none',
