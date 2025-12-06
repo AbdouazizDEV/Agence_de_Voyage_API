@@ -666,7 +666,7 @@ async function seedWhatsAppLogs() {
       status: 'sent',
       sent_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
     },
-  ];
+  ];  
 
   for (const log of logs) {
     await prisma.whatsAppLog.create({
@@ -675,6 +675,420 @@ async function seedWhatsAppLogs() {
   }
 
   console.log(`✅ ${logs.length} logs WhatsApp créés`);
+}
+/**
+ * Seed des réservations
+ */
+async function seedReservations() {
+  console.log('🌱 Seeding reservations...');
+
+  const clients = await prisma.client.findMany({ take: 8 });
+  const offers = await prisma.offer.findMany({ take: 8 });
+
+  if (clients.length === 0 || offers.length === 0) {
+    console.log('⚠️  Pas de clients ou d\'offres, skip des réservations');
+    return [];
+  }
+
+  const createdReservations = [];
+
+  // Réservation 1: En attente de paiement
+  const offer1 = offers[0];
+  const totalAmount1 = parseFloat(offer1.price.toString()) * 2;
+  const reservation1 = await prisma.reservation.create({
+    data: {
+      client_id: clients[0].id,
+      offer_id: offer1.id,
+      number_of_guests: 2,
+      total_amount: totalAmount1,
+      currency: offer1.currency,
+      status: 'pending',
+      reservation_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // Il y a 2 jours
+      departure_date: offer1.departure_date || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      return_date: offer1.return_date || new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      special_requests: 'Chambre avec vue sur mer',
+    },
+  });
+  createdReservations.push(reservation1);
+
+  // Mettre à jour les places disponibles
+  await prisma.offer.update({
+    where: { id: offer1.id },
+    data: {
+      available_seats: {
+        decrement: 2,
+      },
+      bookings_count: {
+        increment: 1,
+      },
+    },
+  });
+
+  // Réservation 2: Confirmée avec paiement
+  const offer2 = offers[1];
+  let totalAmount2 = parseFloat(offer2.price.toString()) * 1;
+  if (offer2.is_promotion && offer2.promotion_discount) {
+    totalAmount2 = totalAmount2 - (totalAmount2 * offer2.promotion_discount / 100);
+  }
+  const reservation2 = await prisma.reservation.create({
+    data: {
+      client_id: clients[1].id,
+      offer_id: offer2.id,
+      number_of_guests: 1,
+      total_amount: totalAmount2,
+      currency: offer2.currency,
+      status: 'confirmed',
+      reservation_date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // Il y a 5 jours
+      departure_date: offer2.departure_date || new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      return_date: offer2.return_date || new Date(Date.now() + 6 * 24 * 60 * 60 * 1000),
+    },
+  });
+  createdReservations.push(reservation2);
+
+  // Créer le paiement pour la réservation 2
+  await prisma.payment.create({
+    data: {
+      reservation_id: reservation2.id,
+      amount: totalAmount2,
+      currency: offer2.currency,
+      payment_method: 'card',
+      status: 'completed',
+      transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      payment_date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  await prisma.offer.update({
+    where: { id: offer2.id },
+    data: {
+      available_seats: {
+        decrement: 1,
+      },
+      bookings_count: {
+        increment: 1,
+      },
+    },
+  });
+
+  // Réservation 3: Confirmée (dans 7 jours - pour notification)
+  const offer3 = offers[2];
+  let totalAmount3 = parseFloat(offer3.price.toString()) * 3;
+  if (offer3.is_promotion && offer3.promotion_discount) {
+    totalAmount3 = totalAmount3 - (totalAmount3 * offer3.promotion_discount / 100);
+  }
+  const departureDate3 = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Dans 7 jours
+  const reservation3 = await prisma.reservation.create({
+    data: {
+      client_id: clients[2].id,
+      offer_id: offer3.id,
+      number_of_guests: 3,
+      total_amount: totalAmount3,
+      currency: offer3.currency,
+      status: 'confirmed',
+      reservation_date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+      departure_date: departureDate3,
+      return_date: new Date(departureDate3.getTime() + offer3.duration * 24 * 60 * 60 * 1000),
+    },
+  });
+  createdReservations.push(reservation3);
+
+  await prisma.payment.create({
+    data: {
+      reservation_id: reservation3.id,
+      amount: totalAmount3,
+      currency: offer3.currency,
+      payment_method: 'mobile_money',
+      status: 'completed',
+      transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      payment_date: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  await prisma.offer.update({
+    where: { id: offer3.id },
+    data: {
+      available_seats: {
+        decrement: 3,
+      },
+      bookings_count: {
+        increment: 1,
+      },
+    },
+  });
+
+  // Réservation 4: Confirmée (dans 3 jours - pour notification)
+  const offer4 = offers[3];
+  let totalAmount4 = parseFloat(offer4.price.toString()) * 2;
+  if (offer4.is_promotion && offer4.promotion_discount) {
+    totalAmount4 = totalAmount4 - (totalAmount4 * offer4.promotion_discount / 100);
+  }
+  const departureDate4 = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // Dans 3 jours
+  const reservation4 = await prisma.reservation.create({
+    data: {
+      client_id: clients[3].id,
+      offer_id: offer4.id,
+      number_of_guests: 2,
+      total_amount: totalAmount4,
+      currency: offer4.currency,
+      status: 'confirmed',
+      reservation_date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+      departure_date: departureDate4,
+      return_date: new Date(departureDate4.getTime() + offer4.duration * 24 * 60 * 60 * 1000),
+    },
+  });
+  createdReservations.push(reservation4);
+
+  await prisma.payment.create({
+    data: {
+      reservation_id: reservation4.id,
+      amount: totalAmount4,
+      currency: offer4.currency,
+      payment_method: 'bank_transfer',
+      status: 'completed',
+      transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      payment_date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  await prisma.offer.update({
+    where: { id: offer4.id },
+    data: {
+      available_seats: {
+        decrement: 2,
+      },
+      bookings_count: {
+        increment: 1,
+      },
+    },
+  });
+
+  // Réservation 5: Annulée (avec remboursement)
+  const offer5 = offers[4];
+  let totalAmount5 = parseFloat(offer5.price.toString()) * 1;
+  if (offer5.is_promotion && offer5.promotion_discount) {
+    totalAmount5 = totalAmount5 - (totalAmount5 * offer5.promotion_discount / 100);
+  }
+  const reservation5 = await prisma.reservation.create({
+    data: {
+      client_id: clients[4].id,
+      offer_id: offer5.id,
+      number_of_guests: 1,
+      total_amount: totalAmount5,
+      currency: offer5.currency,
+      status: 'cancelled',
+      reservation_date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+      departure_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      return_date: new Date(Date.now() + 37 * 24 * 60 * 60 * 1000),
+      cancellation_reason: 'Changement de plan',
+      cancelled_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+    },
+  });
+  createdReservations.push(reservation5);
+
+  const payment5 = await prisma.payment.create({
+    data: {
+      reservation_id: reservation5.id,
+      amount: totalAmount5,
+      currency: offer5.currency,
+      payment_method: 'card',
+      status: 'refunded',
+      transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      payment_date: new Date(Date.now() - 19 * 24 * 60 * 60 * 1000),
+      refund_amount: totalAmount5,
+      refund_date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+      refund_reason: 'Annulation de réservation',
+    },
+  });
+
+  await prisma.offer.update({
+    where: { id: offer5.id },
+    data: {
+      available_seats: {
+        increment: 1, // Restaurer la place
+      },
+    },
+  });
+
+  // Réservation 6: Complétée
+  const offer6 = offers[5];
+  let totalAmount6 = parseFloat(offer6.price.toString()) * 2;
+  if (offer6.is_promotion && offer6.promotion_discount) {
+    totalAmount6 = totalAmount6 - (totalAmount6 * offer6.promotion_discount / 100);
+  }
+  const reservation6 = await prisma.reservation.create({
+    data: {
+      client_id: clients[5].id,
+      offer_id: offer6.id,
+      number_of_guests: 2,
+      total_amount: totalAmount6,
+      currency: offer6.currency,
+      status: 'completed',
+      reservation_date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+      departure_date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+      return_date: new Date(Date.now() - 23 * 24 * 60 * 60 * 1000),
+    },
+  });
+  createdReservations.push(reservation6);
+
+  await prisma.payment.create({
+    data: {
+      reservation_id: reservation6.id,
+      amount: totalAmount6,
+      currency: offer6.currency,
+      payment_method: 'card',
+      status: 'completed',
+      transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      payment_date: new Date(Date.now() - 59 * 24 * 60 * 60 * 1000),
+    },
+  });
+
+  console.log(`✅ ${createdReservations.length} réservations créées`);
+  return createdReservations;
+}
+
+/**
+ * Seed des notifications
+ */
+async function seedNotifications(reservations: any[]) {
+  console.log('🌱 Seeding notifications...');
+
+  if (reservations.length === 0) {
+    console.log('⚠️  Pas de réservations, skip des notifications');
+    return;
+  }
+
+  const clients = await prisma.client.findMany({ take: 10 });
+  const offers = await prisma.offer.findMany({ take: 10 });
+
+  if (clients.length === 0) {
+    console.log('⚠️  Pas de clients, skip des notifications');
+    return;
+  }
+
+  const notifications = [];
+
+  // Notification 1: Réservation créée
+  if (reservations[0]) {
+    const offer = offers.find(o => o.id === reservations[0].offer_id);
+    notifications.push({
+      client_id: reservations[0].client_id,
+      reservation_id: reservations[0].id,
+      type: 'reservation_created',
+      title: 'Réservation créée',
+      message: `Votre réservation pour "${offer?.title || 'cette offre'}" a été créée. Montant total: ${reservations[0].total_amount} ${reservations[0].currency}`,
+      is_read: false,
+      created_at: reservations[0].reservation_date,
+    });
+  }
+
+  // Notification 2: Paiement effectué
+  if (reservations[1]) {
+    const offer = offers.find(o => o.id === reservations[1].offer_id);
+    notifications.push({
+      client_id: reservations[1].client_id,
+      reservation_id: reservations[1].id,
+      type: 'payment_completed',
+      title: 'Paiement effectué',
+      message: `Votre paiement de ${reservations[1].total_amount} ${reservations[1].currency} a été effectué avec succès pour "${offer?.title || 'cette offre'}".`,
+      is_read: true,
+      read_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+      created_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+    });
+  }
+
+  // Notification 3: Rappel 7 jours avant (pour réservation dans 7 jours)
+  if (reservations[2]) {
+    const offer = offers.find(o => o.id === reservations[2].offer_id);
+    const departureDate = reservations[2].departure_date;
+    if (departureDate) {
+      notifications.push({
+        client_id: reservations[2].client_id,
+        reservation_id: reservations[2].id,
+        type: 'reservation_reminder',
+        title: 'Rappel de réservation',
+        message: `Votre voyage "${offer?.title || 'cette offre'}" commence dans 7 jours (${new Date(departureDate).toLocaleDateString('fr-FR')}). Préparez-vous !`,
+        is_read: false,
+        created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+      });
+    }
+  }
+
+  // Notification 4: Rappel 3 jours avant (pour réservation dans 3 jours)
+  if (reservations[3]) {
+    const offer = offers.find(o => o.id === reservations[3].offer_id);
+    const departureDate = reservations[3].departure_date;
+    if (departureDate) {
+      notifications.push({
+        client_id: reservations[3].client_id,
+        reservation_id: reservations[3].id,
+        type: 'reservation_reminder',
+        title: 'Rappel de réservation',
+        message: `Votre voyage "${offer?.title || 'cette offre'}" commence dans 3 jours. N'oubliez pas de préparer vos documents !`,
+        is_read: false,
+        created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      });
+    }
+  }
+
+  // Notification 5: Réservation annulée
+  if (reservations[4]) {
+    const offer = offers.find(o => o.id === reservations[4].offer_id);
+    notifications.push({
+      client_id: reservations[4].client_id,
+      reservation_id: reservations[4].id,
+      type: 'reservation_cancelled',
+      title: 'Réservation annulée',
+      message: `Votre réservation pour "${offer?.title || 'cette offre'}" a été annulée. Le remboursement sera traité sous 5-7 jours ouvrés.`,
+      is_read: false,
+      created_at: reservations[4].cancelled_at || new Date(),
+    });
+  }
+
+  // Notification 6: Rappel de paiement (pour réservation en attente)
+  if (reservations[0] && reservations[0].status === 'pending') {
+    const offer = offers.find(o => o.id === reservations[0].offer_id);
+    notifications.push({
+      client_id: reservations[0].client_id,
+      reservation_id: reservations[0].id,
+      type: 'payment_reminder',
+      title: 'Paiement en attente',
+      message: `N'oubliez pas de finaliser le paiement pour votre réservation "${offer?.title || 'cette offre'}". Montant: ${reservations[0].total_amount} ${reservations[0].currency}`,
+      is_read: false,
+      created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+    });
+  }
+
+  // Notifications générales pour d'autres clients
+  if (clients.length > 6) {
+    notifications.push({
+      client_id: clients[6].id,
+      reservation_id: null,
+      type: 'general',
+      title: 'Bienvenue !',
+      message: 'Bienvenue sur notre plateforme de réservation. Découvrez nos offres exceptionnelles !',
+      is_read: false,
+      created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+    });
+
+    notifications.push({
+      client_id: clients[7].id,
+      reservation_id: null,
+      type: 'promotion',
+      title: 'Offres promotionnelles',
+      message: 'Profitez de nos offres promotionnelles avec jusqu\'à 20% de réduction !',
+      is_read: true,
+      read_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+    });
+  }
+
+  for (const notification of notifications) {
+    await prisma.notification.create({
+      data: notification,
+    });
+  }
+
+  console.log(`✅ ${notifications.length} notifications créées`);
 }
 
 /**
@@ -689,6 +1103,8 @@ async function main() {
     await seedCategories();
     await seedOffers();
     await seedWhatsAppLogs();
+    const reservations = await seedReservations(); // Créer les réservations d'abord
+    await seedNotifications(reservations); // Puis les notifications qui référencent les réservations
 
     console.log('\n✅ Seeding terminé avec succès !');
   } catch (error) {
