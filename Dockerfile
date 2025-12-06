@@ -61,4 +61,4 @@ ENV PORT=3000
 ENV NODE_ENV=production
 
 # Commande de démarrage
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/src/main.js"]
