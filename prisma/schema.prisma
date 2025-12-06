@@ -49,7 +49,7 @@ model Offer {
   reviews_count      Int       @default(0) @map("reviews_count")
   bookings_count     Int       @default(0) @map("bookings_count")
   views_count        Int       @default(0) @map("views_count")
-  available_seats   Int       @default(0) @map("available_seats")
+  available_seats    Int       @default(0) @map("available_seats")
   max_capacity       Int?      @map("max_capacity")
   departure_date     DateTime? @map("departure_date") @db.Timestamptz(6)
   return_date        DateTime? @map("return_date") @db.Timestamptz(6)
@@ -59,6 +59,7 @@ model Offer {
   updated_at         DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   whatsapp_logs WhatsAppLog[]
+  reservations  Reservation[]
 
   @@index([category], map: "idx_offers_category")
   @@index([destination], map: "idx_offers_destination")
@@ -71,15 +72,15 @@ model Offer {
 }
 
 model Category {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name         String   @unique @db.VarChar(100)
-  slug         String   @unique @db.VarChar(100)
-  description  String?  @db.Text
-  icon         String?  @db.VarChar(50)
-  display_order Int     @default(0) @map("display_order")
-  is_active    Boolean  @default(true) @map("is_active")
-  created_at   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updated_at   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String   @unique @db.VarChar(100)
+  slug          String   @unique @db.VarChar(100)
+  description   String?  @db.Text
+  icon          String?  @db.VarChar(50)
+  display_order Int      @default(0) @map("display_order")
+  is_active     Boolean  @default(true) @map("is_active")
+  created_at    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@index([slug], map: "idx_categories_slug")
   @@index([display_order], map: "idx_categories_display_order")
@@ -97,22 +98,25 @@ model Client {
   created_at DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updated_at DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
+  reservations  Reservation[]
+  notifications Notification[]
+
   @@index([email], map: "idx_clients_email")
   @@index([phone], map: "idx_clients_phone")
   @@map("clients")
 }
 
 model WhatsAppLog {
-  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  offer_id      String?   @map("offer_id") @db.Uuid
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  offer_id       String?  @map("offer_id") @db.Uuid
   customer_phone String   @map("customer_phone") @db.VarChar(20)
-  customer_name String?   @map("customer_name") @db.VarChar(255)
-  message       String    @db.Text
-  type          String    @default("offer_inquiry") @db.VarChar(50)
-  status        String    @default("pending") @db.VarChar(50)
-  error_message String?   @map("error_message") @db.Text
-  sent_at       DateTime  @default(now()) @map("sent_at") @db.Timestamptz(6)
-  created_at    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  customer_name  String?  @map("customer_name") @db.VarChar(255)
+  message        String   @db.Text
+  type           String   @default("offer_inquiry") @db.VarChar(50)
+  status         String   @default("pending") @db.VarChar(50)
+  error_message  String?  @map("error_message") @db.Text
+  sent_at        DateTime @default(now()) @map("sent_at") @db.Timestamptz(6)
+  created_at     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   offer Offer? @relation(fields: [offer_id], references: [id], onDelete: SetNull)
 
@@ -120,4 +124,78 @@ model WhatsAppLog {
   @@index([status], map: "idx_whatsapp_logs_status")
   @@index([sent_at(sort: Desc)], map: "idx_whatsapp_logs_sent_at")
   @@map("whatsapp_logs")
+}
+
+model Reservation {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  client_id           String    @map("client_id") @db.Uuid
+  offer_id            String    @map("offer_id") @db.Uuid
+  number_of_guests    Int       @map("number_of_guests")
+  total_amount        Decimal   @map("total_amount") @db.Decimal(12, 2)
+  currency            String    @default("FCFA") @db.VarChar(10)
+  status              String    @default("pending") @db.VarChar(50)
+  reservation_date    DateTime  @map("reservation_date") @db.Timestamptz(6)
+  departure_date      DateTime? @map("departure_date") @db.Timestamptz(6)
+  return_date         DateTime? @map("return_date") @db.Timestamptz(6)
+  special_requests    String?   @map("special_requests") @db.Text
+  cancellation_reason String?   @map("cancellation_reason") @db.Text
+  cancelled_at        DateTime? @map("cancelled_at") @db.Timestamptz(6)
+  created_at          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updated_at          DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  client        Client         @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  offer         Offer          @relation(fields: [offer_id], references: [id], onDelete: Restrict)
+  payments      Payment[]
+  notifications Notification[]
+
+  @@index([client_id], map: "idx_reservations_client_id")
+  @@index([offer_id], map: "idx_reservations_offer_id")
+  @@index([status], map: "idx_reservations_status")
+  @@index([reservation_date(sort: Desc)], map: "idx_reservations_reservation_date")
+  @@map("reservations")
+}
+
+model Payment {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reservation_id String    @map("reservation_id") @db.Uuid
+  amount         Decimal   @db.Decimal(12, 2)
+  currency       String    @default("FCFA") @db.VarChar(10)
+  payment_method String    @map("payment_method") @db.VarChar(50)
+  status         String    @default("pending") @db.VarChar(50)
+  transaction_id String?   @map("transaction_id") @db.VarChar(255)
+  payment_date   DateTime? @map("payment_date") @db.Timestamptz(6)
+  refund_amount  Decimal?  @map("refund_amount") @db.Decimal(12, 2)
+  refund_date    DateTime? @map("refund_date") @db.Timestamptz(6)
+  refund_reason  String?   @map("refund_reason") @db.Text
+  created_at     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updated_at     DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  reservation Reservation @relation(fields: [reservation_id], references: [id], onDelete: Cascade)
+
+  @@index([reservation_id], map: "idx_payments_reservation_id")
+  @@index([status], map: "idx_payments_status")
+  @@index([transaction_id], map: "idx_payments_transaction_id")
+  @@index([payment_date(sort: Desc)], map: "idx_payments_payment_date")
+  @@map("payments")
+}
+
+model Notification {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  client_id      String?   @map("client_id") @db.Uuid
+  reservation_id String?   @map("reservation_id") @db.Uuid
+  type           String    @db.VarChar(50)
+  title          String    @db.VarChar(255)
+  message        String    @db.Text
+  is_read        Boolean   @default(false) @map("is_read")
+  read_at        DateTime? @map("read_at") @db.Timestamptz(6)
+  created_at     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  client      Client?      @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  reservation Reservation? @relation(fields: [reservation_id], references: [id], onDelete: Cascade)
+
+  @@index([client_id], map: "idx_notifications_client_id")
+  @@index([reservation_id], map: "idx_notifications_reservation_id")
+  @@index([is_read], map: "idx_notifications_is_read")
+  @@index([created_at(sort: Desc)], map: "idx_notifications_created_at")
+  @@map("notifications")
 }
