@@ -203,11 +203,22 @@ export class OffersService {
   }
 
   async search(searchDto: SearchOfferDto) {
-    const offers = await this.offersRepository.search(searchDto);
+    const result = await this.offersRepository.search(searchDto);
+    const page = searchDto.page || 1;
+    const limit = searchDto.limit || 12;
+    const totalPages = Math.ceil(result.total / limit);
 
     return {
       success: true,
-      data: offers,
+      data: result.data,
+      pagination: {
+        page,
+        limit,
+        total: result.total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrevious: page > 1,
+      },
     };
   }
 
@@ -222,6 +233,15 @@ export class OffersService {
 
   async findPopular() {
     const offers = await this.offersRepository.findPopular();
+
+    return {
+      success: true,
+      data: offers,
+    };
+  }
+
+  async getSuggestions(limit: number = 6) {
+    const offers = await this.offersRepository.getSuggestions(limit);
 
     return {
       success: true,
