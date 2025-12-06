@@ -75,6 +75,8 @@ export function setupSwagger(app: INestApplication): void {
       'JWT-auth',
     )
     .addServer('http://localhost:3000', 'Serveur de développement')
+    .addServer('https://agencedevoyageapi.netlify.app', 'Serveur Netlify')
+    .addServer('https://agence-de-voyage-api.onrender.com', 'Serveur Render')
     .addServer('https://api.travel-agency.com', 'Serveur de production')
     .build();
 

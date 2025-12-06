@@ -61,8 +61,9 @@ async function bootstrap() {
   // Configuration Swagger
   setupSwagger(app);
 
-  const port = configService.get<number>('PORT', 3000);
-  await app.listen(port);
+  // Render fournit le port via process.env.PORT
+  const port = process.env.PORT || configService.get<number>('PORT', 3000);
+  await app.listen(port, '0.0.0.0'); // Écouter sur toutes les interfaces pour Render
 
   console.log(`
   ╔═══════════════════════════════════════════════════════════════╗
