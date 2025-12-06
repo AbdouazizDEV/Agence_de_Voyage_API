@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Admin {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email      String   @unique @db.VarChar(255)
+  password   String   @db.VarChar(255)
+  first_name String   @map("first_name") @db.VarChar(100)
+  last_name  String   @map("last_name") @db.VarChar(100)
+  role       String   @default("admin") @db.VarChar(50)
+  is_active  Boolean  @default(true) @map("is_active")
+  created_at DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([email], map: "idx_admins_email")
+  @@index([role], map: "idx_admins_role")
+  @@map("admins")
+}
+
+model Offer {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title              String    @db.VarChar(255)
+  slug               String    @unique @db.VarChar(255)
+  destination        String    @db.VarChar(255)
+  category           String    @db.VarChar(50)
+  price              Decimal   @db.Decimal(12, 2)
+  currency           String    @default("FCFA") @db.VarChar(10)
+  duration           Int
+  description        String    @db.Text
+  images             String[]  @default([])
+  itinerary          Json      @default("[]")
+  included           String[]  @default([])
+  excluded           String[]  @default([])
+  is_active          Boolean   @default(true) @map("is_active")
+  is_promotion       Boolean   @default(false) @map("is_promotion")
+  promotion_discount Int?      @map("promotion_discount")
+  promotion_ends_at  DateTime? @map("promotion_ends_at") @db.Timestamptz(6)
+  rating             Decimal   @default(0) @db.Decimal(2, 1)
+  reviews_count      Int       @default(0) @map("reviews_count")
+  bookings_count     Int       @default(0) @map("bookings_count")
+  views_count        Int       @default(0) @map("views_count")
+  available_seats   Int       @default(0) @map("available_seats")
+  max_capacity       Int?      @map("max_capacity")
+  departure_date     DateTime? @map("departure_date") @db.Timestamptz(6)
+  return_date        DateTime? @map("return_date") @db.Timestamptz(6)
+  tags               String[]  @default([])
+  difficulty         String?   @db.VarChar(20)
+  created_at         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updated_at         DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  whatsapp_logs WhatsAppLog[]
+
+  @@index([category], map: "idx_offers_category")
+  @@index([destination], map: "idx_offers_destination")
+  @@index([price], map: "idx_offers_price")
+  @@index([is_active], map: "idx_offers_is_active")
+  @@index([is_promotion], map: "idx_offers_is_promotion")
+  @@index([slug], map: "idx_offers_slug")
+  @@index([created_at(sort: Desc)], map: "idx_offers_created_at")
+  @@map("offers")
+}
+
+model Category {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String   @unique @db.VarChar(100)
+  slug         String   @unique @db.VarChar(100)
+  description  String?  @db.Text
+  icon         String?  @db.VarChar(50)
+  display_order Int     @default(0) @map("display_order")
+  is_active    Boolean  @default(true) @map("is_active")
+  created_at   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updated_at   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([slug], map: "idx_categories_slug")
+  @@index([display_order], map: "idx_categories_display_order")
+  @@map("categories")
+}
+
+model Client {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email      String   @unique @db.VarChar(255)
+  password   String   @db.VarChar(255)
+  first_name String   @map("first_name") @db.VarChar(100)
+  last_name  String   @map("last_name") @db.VarChar(100)
+  phone      String?  @db.VarChar(20)
+  is_active  Boolean  @default(true) @map("is_active")
+  created_at DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([email], map: "idx_clients_email")
+  @@index([phone], map: "idx_clients_phone")
+  @@map("clients")
+}
+
+model WhatsAppLog {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  offer_id      String?   @map("offer_id") @db.Uuid
+  customer_phone String   @map("customer_phone") @db.VarChar(20)
+  customer_name String?   @map("customer_name") @db.VarChar(255)
+  message       String    @db.Text
+  type          String    @default("offer_inquiry") @db.VarChar(50)
+  status        String    @default("pending") @db.VarChar(50)
+  error_message String?   @map("error_message") @db.Text
+  sent_at       DateTime  @default(now()) @map("sent_at") @db.Timestamptz(6)
+  created_at    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  offer Offer? @relation(fields: [offer_id], references: [id], onDelete: SetNull)
+
+  @@index([offer_id], map: "idx_whatsapp_logs_offer_id")
+  @@index([status], map: "idx_whatsapp_logs_status")
+  @@index([sent_at(sort: Desc)], map: "idx_whatsapp_logs_sent_at")
+  @@map("whatsapp_logs")
+}
