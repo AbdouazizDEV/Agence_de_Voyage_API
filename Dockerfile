@@ -1,7 +1,7 @@
 # Dockerfile pour NestJS - Agence de Voyage API
 
 # Étape 1: Build
-FROM node:18.20.0-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -22,7 +22,7 @@ COPY . .
 RUN npm run build
 
 # Étape 2: Production
-FROM node:18.20.0-alpine AS production
+FROM node:20-alpine AS production
 
 WORKDIR /app
 
@@ -61,4 +61,4 @@ ENV PORT=3000
 ENV NODE_ENV=production
 
 # Commande de démarrage
-CMD ["node", "dist/main"]
+CMD ["node", "dist/main.js"]
