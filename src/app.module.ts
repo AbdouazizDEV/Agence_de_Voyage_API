@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaService } from './database/prisma.service';
@@ -18,6 +19,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { ClientsModule } from './modules/clients/clients.module';
+import { ReservationsModule } from './modules/reservations/reservations.module';
 
 /**
  * Module racine de l'application
@@ -31,6 +33,7 @@ import { ClientsModule } from './modules/clients/clients.module';
       load: [appConfig, databaseConfig, jwtConfig],
       envFilePath: '.env',
     }),
+    ScheduleModule.forRoot(),
 
     // Modules métier
     AuthModule,
@@ -41,6 +44,7 @@ import { ClientsModule } from './modules/clients/clients.module';
     UploadModule,
     SettingsModule,
     ClientsModule,
+    ReservationsModule,
   ],
   controllers: [AppController],
   providers: [
