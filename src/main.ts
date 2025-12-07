@@ -19,11 +19,47 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   // CORS - Cross-Origin Resource Sharing
+  // Configuration flexible pour autoriser Swagger et le frontend
+  const corsOrigin = configService.get<string>('CORS_ORIGIN');
+  const nodeEnv = configService.get<string>('NODE_ENV', 'development');
+  
+  // Déterminer les origines autorisées
+  const allowedOrigins: (string | boolean) = (() => {
+    // En production, si CORS_ORIGIN est défini, l'utiliser
+    if (corsOrigin) {
+      // Si plusieurs origines séparées par des virgules
+      if (corsOrigin.includes(',')) {
+        return corsOrigin.split(',').map(origin => origin.trim());
+      }
+      return corsOrigin;
+    }
+    
+    // En développement, autoriser localhost et toutes les origines
+    if (nodeEnv === 'development') {
+      return true; // Autoriser toutes les origines en dev
+    }
+    
+    // En production sans CORS_ORIGIN, autoriser toutes les origines (pour Swagger)
+    // ⚠️ À ajuster selon vos besoins de sécurité
+    return true;
+  })();
+
   app.enableCors({
-    origin: configService.get<string>('CORS_ORIGIN', 'http://localhost:5173'),
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Accept',
+      'X-Requested-With',
+      'Origin',
+      'Access-Control-Request-Method',
+      'Access-Control-Request-Headers',
+    ],
+    exposedHeaders: ['Authorization'],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
 
   // Préfixe global API
