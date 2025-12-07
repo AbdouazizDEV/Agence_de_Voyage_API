@@ -9,26 +9,26 @@ import { ConfigService } from '@nestjs/config';
 export function setupSwagger(app: INestApplication): void {
   const configService = app.get(ConfigService);
   const nodeEnv = configService.get<string>('NODE_ENV', 'development');
-  
+
   // Déterminer l'URL du serveur actuel
   const getServerUrl = (): string => {
     // En production, essayer de détecter l'URL depuis les variables d'environnement
     const renderUrl = process.env.RENDER_EXTERNAL_URL;
     const vercelUrl = process.env.VERCEL_URL;
     const customUrl = process.env.API_URL;
-    
+
     if (customUrl) {
       return customUrl;
     }
-    
+
     if (renderUrl) {
       return renderUrl;
     }
-    
+
     if (vercelUrl) {
       return `https://${vercelUrl}`;
     }
-    
+
     // En développement, utiliser localhost
     return 'http://localhost:3000';
   };
@@ -38,7 +38,8 @@ export function setupSwagger(app: INestApplication): void {
 
   const documentBuilder = new DocumentBuilder()
     .setTitle('Travel Agency API')
-    .setDescription(`
+    .setDescription(
+      `
       # 🌍 API Plateforme Agence de Voyage
       
       ## Description
@@ -76,16 +77,17 @@ export function setupSwagger(app: INestApplication): void {
       ## Support
       - **Email:** abdouazizdiop583@gmail.com
       - **GitHub:** https://github.com/AbdouazizDEV
-    `)
+    `,
+    )
     .setVersion('1.0.0')
     .setContact(
       'Abdou Aziz DIOP',
       'https://github.com/AbdouazizDEV',
       'abdouazizdiop583@gmail.com',
-      'https://www.linkedin.com/in/abdou-aziz-diop-b1aa05287'
+      'https://www.linkedin.com/in/abdou-aziz-diop-b1aa05287',
     )
     .setLicense('MIT', 'https://opensource.org/licenses/MIT')
-    .addTag('Auth', 'Endpoints d\'authentification (Login, Logout, Refresh)')
+    .addTag('Auth', "Endpoints d'authentification (Login, Logout, Refresh)")
     .addTag('Offers', 'Gestion des offres de voyage (Public)')
     .addTag('Offers Admin', 'Gestion des offres (Administration)')
     .addTag('Search', 'Recherche et filtres avancés')
@@ -104,12 +106,36 @@ export function setupSwagger(app: INestApplication): void {
         in: 'header',
       },
       'JWT-auth',
-    )
-    .addServer('http://localhost:3000', 'Serveur de développement')
-    .addServer('https://agencedevoyageapi.netlify.app', 'Serveur Netlify')
-    .addServer('https://agence-de-voyage-api-1.onrender.com/', 'Serveur Render')
-    .addServer('https://api.travel-agency.com', 'Serveur de production')
-    .build();
+    );
+
+  // Ajouter le serveur actuel en premier (sera sélectionné par défaut)
+  documentBuilder.addServer(
+    currentServerUrl,
+    isProduction
+      ? 'Serveur de production (actuel)'
+      : 'Serveur de développement (actuel)',
+  );
+
+  // Ajouter les autres serveurs comme alternatives
+  if (isProduction) {
+    // En production, ajouter localhost comme alternative pour les tests locaux
+    documentBuilder.addServer(
+      'http://localhost:3000',
+      'Serveur local (pour tests)',
+    );
+  } else {
+    // En développement, ajouter les serveurs de production comme alternatives
+    documentBuilder.addServer(
+      'https://agence-de-voyage-api-1.onrender.com',
+      'Serveur Render',
+    );
+    documentBuilder.addServer(
+      'https://agencedevoyageapi.netlify.app',
+      'Serveur Netlify',
+    );
+  }
+
+  const config = documentBuilder.build();
 
   const document = SwaggerModule.createDocument(app, config, {
     deepScanRoutes: true,
@@ -140,6 +166,7 @@ export function setupSwagger(app: INestApplication): void {
     customfavIcon: '/favicon.ico',
   });
 
-  console.log(`📚 Swagger documentation disponible sur: ${currentServerUrl}/api/docs`);
+  console.log(
+    `📚 Swagger documentation disponible sur: ${currentServerUrl}/api/docs`,
+  );
 }
-
