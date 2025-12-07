@@ -144,18 +144,6 @@ export class OffersController {
   }
 
   @Public()
-  @Get(':id')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: "Détails d'une offre",
-    description: "Récupère les détails complets d'une offre par son ID",
-  })
-  @ApiStandardResponse(OfferResponseDto)
-  async findOne(@Param('id') id: string) {
-    return this.offersService.findOne(id);
-  }
-
-  @Public()
   @Post('search')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -254,5 +242,17 @@ export class OffersController {
   @ApiStandardResponse(OfferResponseDto, true)
   async suggestions(@Query('limit') limit?: number) {
     return this.offersService.getSuggestions(limit || 6);
+  }
+
+  @Public()
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Détails d'une offre",
+    description: "Récupère les détails complets d'une offre par son ID",
+  })
+  @ApiStandardResponse(OfferResponseDto)
+  async findOne(@Param('id') id: string) {
+    return this.offersService.findOne(id);
   }
 }
