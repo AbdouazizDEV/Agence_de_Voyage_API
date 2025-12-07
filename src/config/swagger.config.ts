@@ -82,6 +82,7 @@ export function setupSwagger(app: INestApplication): void {
       'Abdou Aziz DIOP',
       'https://github.com/AbdouazizDEV',
       'abdouazizdiop583@gmail.com',
+      'https://www.linkedin.com/in/abdou-aziz-diop-b1aa05287'
     )
     .setLicense('MIT', 'https://opensource.org/licenses/MIT')
     .addTag('Auth', 'Endpoints d\'authentification (Login, Logout, Refresh)')
@@ -103,22 +104,12 @@ export function setupSwagger(app: INestApplication): void {
         in: 'header',
       },
       'JWT-auth',
-    );
-
-  // Ajouter le serveur actuel en premier (sera sélectionné par défaut)
-  documentBuilder.addServer(currentServerUrl, isProduction ? 'Serveur de production (actuel)' : 'Serveur de développement (actuel)');
-  
-  // Ajouter les autres serveurs comme alternatives
-  if (isProduction) {
-    // En production, ajouter localhost comme alternative pour les tests locaux
-    documentBuilder.addServer('http://localhost:3000', 'Serveur local (pour tests)');
-  } else {
-    // En développement, ajouter les serveurs de production comme alternatives
-    documentBuilder.addServer('https://agence-de-voyage-api-1.onrender.com', 'Serveur Render');
-    documentBuilder.addServer('https://agencedevoyageapi.netlify.app', 'Serveur Netlify');
-  }
-
-  const config = documentBuilder.build();
+    )
+    .addServer('http://localhost:3000', 'Serveur de développement')
+    .addServer('https://agencedevoyageapi.netlify.app', 'Serveur Netlify')
+    .addServer('https://agence-de-voyage-api-1.onrender.com/', 'Serveur Render')
+    .addServer('https://api.travel-agency.com', 'Serveur de production')
+    .build();
 
   const document = SwaggerModule.createDocument(app, config, {
     deepScanRoutes: true,
