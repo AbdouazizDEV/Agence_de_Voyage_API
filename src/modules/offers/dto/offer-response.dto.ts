@@ -5,7 +5,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
  * Principe SOLID : Single Responsibility - Gère uniquement la réponse
  */
 export class OfferResponseDto {
-  @ApiProperty({ description: 'ID de l\'offre' })
+  @ApiProperty({ description: "ID de l'offre" })
   id: string;
 
   @ApiProperty({ description: 'Titre' })
@@ -74,4 +74,3 @@ export class OfferResponseDto {
   @ApiProperty({ description: 'Date de création' })
   created_at: Date;
 }
-

@@ -40,4 +40,3 @@ export class ReservationResponseDto {
   @ApiProperty()
   created_at: Date;
 }
-

@@ -45,11 +45,14 @@ export class ReservationsRepository {
     return reservation ? this.mapPrismaToReservation(reservation) : null;
   }
 
-  async findByClientId(clientId: string, filters?: {
-    status?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<{ data: Reservation[]; total: number }> {
+  async findByClientId(
+    clientId: string,
+    filters?: {
+      status?: string;
+      page?: number;
+      limit?: number;
+    },
+  ): Promise<{ data: Reservation[]; total: number }> {
     const page = filters?.page || 1;
     const limit = filters?.limit || 12;
     const skip = (page - 1) * limit;
@@ -112,10 +115,11 @@ export class ReservationsRepository {
   private mapPrismaToReservation(reservation: any): Reservation {
     return {
       ...reservation,
-      total_amount: typeof reservation.total_amount === 'object' && reservation.total_amount !== null
-        ? parseFloat(reservation.total_amount.toString())
-        : reservation.total_amount,
+      total_amount:
+        typeof reservation.total_amount === 'object' &&
+        reservation.total_amount !== null
+          ? parseFloat(reservation.total_amount.toString())
+          : reservation.total_amount,
     };
   }
 }
-

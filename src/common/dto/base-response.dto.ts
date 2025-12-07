@@ -11,7 +11,10 @@ export class BaseResponseDto<T = any> {
   @ApiPropertyOptional({ description: 'Données de la réponse' })
   data?: T;
 
-  @ApiPropertyOptional({ example: 'Opération réussie', description: 'Message informatif' })
+  @ApiPropertyOptional({
+    example: 'Opération réussie',
+    description: 'Message informatif',
+  })
   message?: string;
 
   @ApiPropertyOptional({
@@ -30,4 +33,3 @@ export class BaseResponseDto<T = any> {
     totalPages: number;
   };
 }
-

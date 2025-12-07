@@ -10,17 +10,19 @@ export class CreatePaymentDto {
   @IsNotEmpty()
   reservationId: string;
 
-  @ApiProperty({ 
-    description: 'Méthode de paiement', 
+  @ApiProperty({
+    description: 'Méthode de paiement',
     enum: ['card', 'mobile_money', 'bank_transfer', 'cash'],
-    example: 'card'
+    example: 'card',
   })
   @IsEnum(['card', 'mobile_money', 'bank_transfer', 'cash'])
   paymentMethod: string;
 
-  @ApiPropertyOptional({ description: 'ID de transaction (pour simulation)', example: 'TXN123456' })
+  @ApiPropertyOptional({
+    description: 'ID de transaction (pour simulation)',
+    example: 'TXN123456',
+  })
   @IsOptional()
   @IsString()
   transactionId?: string;
 }
-

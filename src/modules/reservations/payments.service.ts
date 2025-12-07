@@ -9,4 +9,3 @@ import { PaymentsRepository } from './payments.repository';
 export class PaymentsService {
   constructor(private readonly paymentsRepository: PaymentsRepository) {}
 }
-

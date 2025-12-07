@@ -18,4 +18,3 @@ export interface Reservation {
   created_at: Date;
   updated_at: Date;
 }
-

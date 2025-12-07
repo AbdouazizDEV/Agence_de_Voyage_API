@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { ClientsRepository } from './clients.repository';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -19,7 +23,7 @@ export class ClientsService {
 
     return {
       success: true,
-      data: result.data.map(client => ({
+      data: result.data.map((client) => ({
         id: client.id,
         email: client.email,
         firstName: client.first_name,
@@ -63,7 +67,9 @@ export class ClientsService {
 
   async create(createDto: CreateClientDto) {
     // Vérifier si l'email existe déjà
-    const existingByEmail = await this.clientsRepository.findByEmail(createDto.email);
+    const existingByEmail = await this.clientsRepository.findByEmail(
+      createDto.email,
+    );
     if (existingByEmail) {
       throw new ConflictException({
         code: ERROR_CODES.RESOURCE_ALREADY_EXISTS,
@@ -72,7 +78,9 @@ export class ClientsService {
     }
 
     // Hasher le mot de passe
-    const hashedPassword = await EncryptionUtil.hashPassword(createDto.password);
+    const hashedPassword = await EncryptionUtil.hashPassword(
+      createDto.password,
+    );
 
     try {
       const client = await this.clientsRepository.create({
@@ -115,7 +123,9 @@ export class ClientsService {
 
     // Hasher le mot de passe si fourni
     if (updateDto.password) {
-      updateDto.password = await EncryptionUtil.hashPassword(updateDto.password);
+      updateDto.password = await EncryptionUtil.hashPassword(
+        updateDto.password,
+      );
     }
 
     const client = await this.clientsRepository.update(id, updateDto);
@@ -163,4 +173,3 @@ export class ClientsService {
     };
   }
 }
-

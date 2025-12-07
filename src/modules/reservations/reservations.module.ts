@@ -27,4 +27,3 @@ import { PrismaService } from '../../database/prisma.service';
   exports: [ReservationsService, NotificationsService],
 })
 export class ReservationsModule {}
-

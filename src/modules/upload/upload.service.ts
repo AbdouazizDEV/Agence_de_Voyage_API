@@ -17,11 +17,17 @@ export class UploadService {
       10,
     );
     this.allowedMimeTypes = this.configService
-      .get<string>('ALLOWED_FILE_TYPES', 'image/jpeg,image/png,image/webp,image/jpg')
+      .get<string>(
+        'ALLOWED_FILE_TYPES',
+        'image/jpeg,image/png,image/webp,image/jpg',
+      )
       .split(',');
   }
 
-  async uploadFile(file: Express.Multer.File, folder = 'offers'): Promise<{
+  async uploadFile(
+    file: Express.Multer.File,
+    folder = 'offers',
+  ): Promise<{
     url: string;
     filename: string;
     size: number;
@@ -51,7 +57,10 @@ export class UploadService {
     // Validation de tous les fichiers
     files.forEach((file) => this.validateFile(file));
 
-    const uploaded = await this.supabaseStorage.uploadMultipleFiles(files, folder);
+    const uploaded = await this.supabaseStorage.uploadMultipleFiles(
+      files,
+      folder,
+    );
 
     return {
       uploaded,
@@ -86,4 +95,3 @@ export class UploadService {
     }
   }
 }
-

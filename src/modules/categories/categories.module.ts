@@ -11,4 +11,3 @@ import { PrismaService } from '../../database/prisma.service';
   exports: [CategoriesService],
 })
 export class CategoriesModule {}
-

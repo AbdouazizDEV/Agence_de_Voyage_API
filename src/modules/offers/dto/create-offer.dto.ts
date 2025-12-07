@@ -18,7 +18,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
  * Principe SOLID : Single Responsibility - Gère uniquement les données de création
  */
 export class CreateOfferDto {
-  @ApiProperty({ description: 'Titre de l\'offre', example: 'Séjour à Paris' })
+  @ApiProperty({ description: "Titre de l'offre", example: 'Séjour à Paris' })
   @IsString()
   @IsNotEmpty()
   title: string;
@@ -32,7 +32,8 @@ export class CreateOfferDto {
   destination: string;
 
   @ApiProperty({
-    description: 'Catégorie (nom de la catégorie, ex: "Vols", "Hôtels", "Croisières", etc.)',
+    description:
+      'Catégorie (nom de la catégorie, ex: "Vols", "Hôtels", "Croisières", etc.)',
     example: 'Séjours',
   })
   @IsString()
@@ -44,7 +45,11 @@ export class CreateOfferDto {
   @Min(0)
   price: number;
 
-  @ApiPropertyOptional({ description: 'Devise', example: 'FCFA', default: 'FCFA' })
+  @ApiPropertyOptional({
+    description: 'Devise',
+    example: 'FCFA',
+    default: 'FCFA',
+  })
   @IsOptional()
   @IsString()
   currency?: string;
@@ -91,7 +96,11 @@ export class CreateOfferDto {
   @IsBoolean()
   is_promotion?: boolean;
 
-  @ApiPropertyOptional({ description: 'Remise promotionnelle (%)', minimum: 0, maximum: 100 })
+  @ApiPropertyOptional({
+    description: 'Remise promotionnelle (%)',
+    minimum: 0,
+    maximum: 100,
+  })
   @ValidateIf((o) => o.is_promotion === true)
   @IsOptional()
   @IsNumber()
@@ -135,4 +144,3 @@ export class CreateOfferDto {
   @IsEnum(['easy', 'moderate', 'hard'])
   difficulty?: string;
 }
-

@@ -39,4 +39,3 @@ export class SettingsAdminController {
     return this.settingsService.updateSettings(updateDto);
   }
 }
-

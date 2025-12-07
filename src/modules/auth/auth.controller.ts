@@ -67,7 +67,9 @@ export class AuthController {
     description: 'Génère un nouveau access token à partir du refresh token',
   })
   @ApiStandardResponse(AuthResponseDto)
-  async refresh(@Body() refreshTokenDto: RefreshTokenDto): Promise<AuthResponseDto> {
+  async refresh(
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ): Promise<AuthResponseDto> {
     return this.authService.refreshToken(refreshTokenDto.refreshToken);
   }
 
@@ -77,7 +79,7 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Déconnexion',
-    description: 'Déconnecte l\'utilisateur actuel',
+    description: "Déconnecte l'utilisateur actuel",
   })
   async logout() {
     return this.authService.logout();
@@ -89,7 +91,8 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Profil administrateur',
-    description: 'Récupère les informations du profil de l\'administrateur connecté',
+    description:
+      "Récupère les informations du profil de l'administrateur connecté",
   })
   async getAdminProfile(@Request() req: any) {
     return this.authService.getProfile(req.user.id);
@@ -105,7 +108,9 @@ export class AuthController {
     description: 'Crée un nouveau compte client',
   })
   @ApiStandardResponse(ClientAuthResponseDto)
-  async clientRegister(@Body() registerDto: ClientRegisterDto): Promise<ClientAuthResponseDto> {
+  async clientRegister(
+    @Body() registerDto: ClientRegisterDto,
+  ): Promise<ClientAuthResponseDto> {
     return this.clientAuthService.register(registerDto);
   }
 
@@ -117,7 +122,9 @@ export class AuthController {
     description: 'Authentifie un client et retourne les tokens JWT',
   })
   @ApiStandardResponse(ClientAuthResponseDto)
-  async clientLogin(@Body() loginDto: ClientLoginDto): Promise<ClientAuthResponseDto> {
+  async clientLogin(
+    @Body() loginDto: ClientLoginDto,
+  ): Promise<ClientAuthResponseDto> {
     return this.clientAuthService.login(loginDto);
   }
 
@@ -129,7 +136,9 @@ export class AuthController {
     description: 'Génère un nouveau access token à partir du refresh token',
   })
   @ApiStandardResponse(ClientAuthResponseDto)
-  async clientRefresh(@Body() refreshTokenDto: RefreshTokenDto): Promise<ClientAuthResponseDto> {
+  async clientRefresh(
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ): Promise<ClientAuthResponseDto> {
     return this.clientAuthService.refreshToken(refreshTokenDto.refreshToken);
   }
 
@@ -145,4 +154,3 @@ export class AuthController {
     return this.clientAuthService.getProfile(req.user.id);
   }
 }
-

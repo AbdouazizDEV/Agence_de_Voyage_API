@@ -34,4 +34,3 @@ export class ClientAuthResponseDto {
     phone?: string;
   };
 }
-

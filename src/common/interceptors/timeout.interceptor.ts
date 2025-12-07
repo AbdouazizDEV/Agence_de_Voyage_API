@@ -18,8 +18,7 @@ export class TimeoutInterceptor implements NestInterceptor {
   constructor(private readonly configService: ConfigService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const timeoutMs =
-      this.configService.get<number>('REQUEST_TIMEOUT', 30000);
+    const timeoutMs = this.configService.get<number>('REQUEST_TIMEOUT', 30000);
 
     return next.handle().pipe(
       timeout(timeoutMs),
@@ -32,4 +31,3 @@ export class TimeoutInterceptor implements NestInterceptor {
     );
   }
 }
-

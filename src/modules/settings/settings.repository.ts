@@ -48,13 +48,21 @@ export class SettingsRepository {
         ...(updateDto.companyPhone && { phone: updateDto.companyPhone }),
         ...(updateDto.address && { address: updateDto.address }),
         ...(updateDto.description && { description: updateDto.description }),
-        ...(updateDto.whatsappNumber && { whatsappNumber: updateDto.whatsappNumber }),
+        ...(updateDto.whatsappNumber && {
+          whatsappNumber: updateDto.whatsappNumber,
+        }),
       },
       whatsapp: {
         ...current.whatsapp,
-        ...(updateDto.whatsappNumber && { phoneNumber: updateDto.whatsappNumber }),
-        ...(updateDto.whatsappMessageTemplate && { messageTemplate: updateDto.whatsappMessageTemplate }),
-        ...(updateDto.whatsappEnabled !== undefined && { enabled: updateDto.whatsappEnabled }),
+        ...(updateDto.whatsappNumber && {
+          phoneNumber: updateDto.whatsappNumber,
+        }),
+        ...(updateDto.whatsappMessageTemplate && {
+          messageTemplate: updateDto.whatsappMessageTemplate,
+        }),
+        ...(updateDto.whatsappEnabled !== undefined && {
+          enabled: updateDto.whatsappEnabled,
+        }),
       },
       general: {
         ...current.general,
@@ -63,4 +71,3 @@ export class SettingsRepository {
     };
   }
 }
-

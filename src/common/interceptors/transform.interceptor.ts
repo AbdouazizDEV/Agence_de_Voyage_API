@@ -13,9 +13,10 @@ import { IApiResponse } from '../interfaces/api-response.interface';
  * Principe SOLID : Single Responsibility - Gère uniquement la transformation
  */
 @Injectable()
-export class TransformInterceptor<T>
-  implements NestInterceptor<T, IApiResponse<T>>
-{
+export class TransformInterceptor<T> implements NestInterceptor<
+  T,
+  IApiResponse<T>
+> {
   intercept(
     context: ExecutionContext,
     next: CallHandler,
@@ -36,4 +37,3 @@ export class TransformInterceptor<T>
     );
   }
 }
-

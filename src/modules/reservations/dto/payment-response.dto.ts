@@ -34,4 +34,3 @@ export class PaymentResponseDto {
   @ApiProperty()
   created_at: Date;
 }
-

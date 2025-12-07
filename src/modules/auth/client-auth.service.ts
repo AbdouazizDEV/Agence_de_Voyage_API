@@ -25,10 +25,14 @@ export class ClientAuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async register(registerDto: ClientRegisterDto): Promise<ClientAuthResponseDto> {
+  async register(
+    registerDto: ClientRegisterDto,
+  ): Promise<ClientAuthResponseDto> {
     // Vérifier si l'email existe déjà
-    const existingClient = await this.clientRepository.findByEmail(registerDto.email);
-    
+    const existingClient = await this.clientRepository.findByEmail(
+      registerDto.email,
+    );
+
     if (existingClient) {
       throw new ConflictException({
         code: ERROR_CODES.RESOURCE_ALREADY_EXISTS,
@@ -37,7 +41,9 @@ export class ClientAuthService {
     }
 
     // Hasher le mot de passe
-    const hashedPassword = await EncryptionUtil.hashPassword(registerDto.password);
+    const hashedPassword = await EncryptionUtil.hashPassword(
+      registerDto.password,
+    );
 
     // Créer le client
     const client = await this.clientRepository.create({
@@ -101,10 +107,11 @@ export class ClientAuthService {
 
   async refreshToken(refreshToken: string): Promise<ClientAuthResponseDto> {
     try {
-      const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET') || 
-                            this.configService.get<string>('JWT_SECRET') || 
-                            'default-refresh-secret';
-      
+      const refreshSecret =
+        this.configService.get<string>('JWT_REFRESH_SECRET') ||
+        this.configService.get<string>('JWT_SECRET') ||
+        'default-refresh-secret';
+
       const payload = this.jwtService.verify(refreshToken, {
         secret: refreshSecret,
       }) as { sub: string; email: string; type?: string };
@@ -181,10 +188,19 @@ export class ClientAuthService {
       type: 'client',
     };
 
-    const jwtSecret = this.configService.get<string>('JWT_SECRET') || 'default-secret';
-    const jwtExpiresIn = this.configService.get<string>('JWT_EXPIRES_IN', '24h');
-    const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET') || 'default-refresh-secret';
-    const refreshExpiresIn = this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d');
+    const jwtSecret =
+      this.configService.get<string>('JWT_SECRET') || 'default-secret';
+    const jwtExpiresIn = this.configService.get<string>(
+      'JWT_EXPIRES_IN',
+      '24h',
+    );
+    const refreshSecret =
+      this.configService.get<string>('JWT_REFRESH_SECRET') ||
+      'default-refresh-secret';
+    const refreshExpiresIn = this.configService.get<string>(
+      'JWT_REFRESH_EXPIRES_IN',
+      '7d',
+    );
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
@@ -200,4 +216,3 @@ export class ClientAuthService {
     return { accessToken, refreshToken };
   }
 }
-

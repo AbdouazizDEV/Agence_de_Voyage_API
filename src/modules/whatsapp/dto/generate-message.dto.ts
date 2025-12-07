@@ -5,7 +5,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
  * DTO pour générer un message WhatsApp
  */
 export class GenerateMessageDto {
-  @ApiProperty({ description: 'ID de l\'offre', example: 'uuid' })
+  @ApiProperty({ description: "ID de l'offre", example: 'uuid' })
   @IsUUID()
   @IsNotEmpty()
   offerId: string;
@@ -25,4 +25,3 @@ export class GenerateMessageDto {
   @IsString()
   customMessage?: string;
 }
-

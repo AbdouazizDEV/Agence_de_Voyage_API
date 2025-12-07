@@ -15,7 +15,10 @@ export class WhatsAppService {
   ) {}
 
   async generateWhatsAppLink(dto: GenerateMessageDto): Promise<string> {
-    const phoneNumber = this.configService.get<string>('WHATSAPP_PHONE_NUMBER', '221761885485');
+    const phoneNumber = this.configService.get<string>(
+      'WHATSAPP_PHONE_NUMBER',
+      '221761885485',
+    );
     const template = this.configService.get<string>(
       'WHATSAPP_MESSAGE_TEMPLATE',
       'Bonjour, je suis intéressé(e) par...',
@@ -27,7 +30,8 @@ export class WhatsAppService {
       select: { title: true, destination: true, price: true },
     });
 
-    const message = dto.customMessage || 
+    const message =
+      dto.customMessage ||
       `${template} ${offer?.title || ''} - ${offer?.destination || ''}`;
 
     // Encoder le message pour l'URL
@@ -51,4 +55,3 @@ export class WhatsAppService {
     return whatsappLink;
   }
 }
-

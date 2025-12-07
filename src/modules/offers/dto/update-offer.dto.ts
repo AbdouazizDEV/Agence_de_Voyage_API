@@ -6,4 +6,3 @@ import { CreateOfferDto } from './create-offer.dto';
  * Principe SOLID : Single Responsibility - Gère uniquement les données de mise à jour
  */
 export class UpdateOfferDto extends PartialType(CreateOfferDto) {}
-

@@ -8,4 +8,3 @@ export interface ITokenPayload {
   role?: string; // Pour les admins
   type?: 'admin' | 'client'; // Type d'utilisateur
 }
-

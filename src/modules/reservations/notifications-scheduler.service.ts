@@ -51,7 +51,8 @@ export class NotificationsSchedulerService implements OnModuleInit {
     for (const reservation of reservations7Days) {
       if (reservation.departure_date) {
         const daysUntil = Math.ceil(
-          (reservation.departure_date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+          (reservation.departure_date.getTime() - now.getTime()) /
+            (1000 * 60 * 60 * 24),
         );
 
         // Vérifier si une notification a déjà été envoyée aujourd'hui pour cette réservation
@@ -106,7 +107,9 @@ export class NotificationsSchedulerService implements OnModuleInit {
       }
     }
 
-    this.logger.log(`Notifications envoyées pour ${reservations7Days.length} réservation(s)`);
+    this.logger.log(
+      `Notifications envoyées pour ${reservations7Days.length} réservation(s)`,
+    );
   }
 
   /**
@@ -165,7 +168,8 @@ export class NotificationsSchedulerService implements OnModuleInit {
       }
     }
 
-    this.logger.log(`Rappels de paiement envoyés pour ${pendingReservations.length} réservation(s)`);
+    this.logger.log(
+      `Rappels de paiement envoyés pour ${pendingReservations.length} réservation(s)`,
+    );
   }
 }
-

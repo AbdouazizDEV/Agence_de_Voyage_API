@@ -15,11 +15,14 @@ export class SupabaseStorageService implements OnModuleInit {
 
   async onModuleInit() {
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
-    const supabaseKey = this.configService.get<string>('SUPABASE_SERVICE_KEY') || 
-                        this.configService.get<string>('SUPABASE_KEY');
+    const supabaseKey =
+      this.configService.get<string>('SUPABASE_SERVICE_KEY') ||
+      this.configService.get<string>('SUPABASE_KEY');
 
     if (!supabaseUrl || !supabaseKey) {
-      console.warn('⚠️  Configuration Supabase Storage manquante - Upload désactivé');
+      console.warn(
+        '⚠️  Configuration Supabase Storage manquante - Upload désactivé',
+      );
       return;
     }
 
@@ -31,7 +34,9 @@ export class SupabaseStorageService implements OnModuleInit {
     folder: string = 'offers',
   ): Promise<string> {
     if (!this.supabase) {
-      throw new Error('Supabase Storage n\'est pas configuré. Vérifiez vos variables d\'environnement.');
+      throw new Error(
+        "Supabase Storage n'est pas configuré. Vérifiez vos variables d'environnement.",
+      );
     }
 
     const fileName = `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
@@ -49,9 +54,9 @@ export class SupabaseStorageService implements OnModuleInit {
     }
 
     // Récupérer l'URL publique
-    const { data: { publicUrl } } = this.supabase.storage
-      .from(this.bucketName)
-      .getPublicUrl(filePath);
+    const {
+      data: { publicUrl },
+    } = this.supabase.storage.from(this.bucketName).getPublicUrl(filePath);
 
     return publicUrl;
   }
@@ -61,7 +66,9 @@ export class SupabaseStorageService implements OnModuleInit {
     folder: string = 'offers',
   ): Promise<Array<{ url: string; filename: string }>> {
     if (!this.supabase) {
-      throw new Error('Supabase Storage n\'est pas configuré. Vérifiez vos variables d\'environnement.');
+      throw new Error(
+        "Supabase Storage n'est pas configuré. Vérifiez vos variables d'environnement.",
+      );
     }
 
     const uploadPromises = files.map(async (file) => {
@@ -78,13 +85,17 @@ export class SupabaseStorageService implements OnModuleInit {
 
   async deleteFile(fileUrl: string): Promise<boolean> {
     if (!this.supabase) {
-      throw new Error('Supabase Storage n\'est pas configuré. Vérifiez vos variables d\'environnement.');
+      throw new Error(
+        "Supabase Storage n'est pas configuré. Vérifiez vos variables d'environnement.",
+      );
     }
 
     try {
       // Extraire le chemin du fichier depuis l'URL
       const urlParts = fileUrl.split('/');
-      const filePath = urlParts.slice(urlParts.indexOf(this.bucketName) + 1).join('/');
+      const filePath = urlParts
+        .slice(urlParts.indexOf(this.bucketName) + 1)
+        .join('/');
 
       const { error } = await this.supabase.storage
         .from(this.bucketName)
@@ -100,4 +111,3 @@ export class SupabaseStorageService implements OnModuleInit {
     }
   }
 }
-

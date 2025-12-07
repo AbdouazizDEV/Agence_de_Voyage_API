@@ -10,7 +10,12 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { ReservationsService } from './reservations.service';
 import { NotificationsService } from './notifications.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
@@ -54,17 +59,27 @@ export class ReservationsController {
   })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 12 })
-  @ApiQuery({ name: 'status', required: false, enum: ['pending', 'confirmed', 'cancelled', 'completed'] })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['pending', 'confirmed', 'cancelled', 'completed'],
+  })
   @ApiStandardResponse(ReservationResponseDto, true)
-  async findAll(@Request() req: any, @Query() pagination: PaginationDto, @Query('status') status?: string) {
-    return this.reservationsService.findAll(req.user.id, pagination, { status });
+  async findAll(
+    @Request() req: any,
+    @Query() pagination: PaginationDto,
+    @Query('status') status?: string,
+  ) {
+    return this.reservationsService.findAll(req.user.id, pagination, {
+      status,
+    });
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Détails d\'une réservation',
-    description: 'Récupère les détails d\'une réservation spécifique',
+    summary: "Détails d'une réservation",
+    description: "Récupère les détails d'une réservation spécifique",
   })
   @ApiStandardResponse(ReservationResponseDto)
   async findOne(@Request() req: any, @Param('id') id: string) {
@@ -78,7 +93,11 @@ export class ReservationsController {
     description: 'Annule une réservation et rembourse le paiement',
   })
   @ApiStandardResponse(ReservationResponseDto)
-  async cancel(@Request() req: any, @Param('id') id: string, @Body() cancelDto: CancelReservationDto) {
+  async cancel(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() cancelDto: CancelReservationDto,
+  ) {
     return this.reservationsService.cancel(req.user.id, id, cancelDto);
   }
 
@@ -89,7 +108,10 @@ export class ReservationsController {
     description: 'Simule un paiement pour une réservation',
   })
   @ApiStandardResponse(PaymentResponseDto)
-  async createPayment(@Request() req: any, @Body() createDto: CreatePaymentDto) {
+  async createPayment(
+    @Request() req: any,
+    @Body() createDto: CreatePaymentDto,
+  ) {
     return this.reservationsService.createPayment(req.user.id, createDto);
   }
 
@@ -97,7 +119,7 @@ export class ReservationsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Historique des paiements',
-    description: 'Récupère l\'historique des paiements d\'une réservation',
+    description: "Récupère l'historique des paiements d'une réservation",
   })
   @ApiStandardResponse(PaymentResponseDto, true)
   async getPayments(@Request() req: any, @Param('id') id: string) {
@@ -120,7 +142,10 @@ export class ReservationsController {
     @Query('isRead') isRead?: boolean,
     @Query('type') type?: string,
   ) {
-    return this.notificationsService.findAll(req.user.id, pagination, { isRead, type });
+    return this.notificationsService.findAll(req.user.id, pagination, {
+      isRead,
+      type,
+    });
   }
 
   @Get('notifications/unread-count')
@@ -153,4 +178,3 @@ export class ReservationsController {
     return this.notificationsService.markAllAsRead(req.user.id);
   }
 }
-

@@ -13,7 +13,10 @@ export class DashboardService {
       this.prisma.offer.findMany({ select: { bookings_count: true } }),
     ]);
 
-    const totalBookings = offers.reduce((sum, offer) => sum + (offer.bookings_count || 0), 0);
+    const totalBookings = offers.reduce(
+      (sum, offer) => sum + (offer.bookings_count || 0),
+      0,
+    );
 
     return {
       success: true,
@@ -26,4 +29,3 @@ export class DashboardService {
     };
   }
 }
-

@@ -7,7 +7,9 @@ import { PaginationDto } from '../../common/dto/pagination.dto';
  */
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly notificationsRepository: NotificationsRepository) {}
+  constructor(
+    private readonly notificationsRepository: NotificationsRepository,
+  ) {}
 
   async findAll(clientId: string, pagination: PaginationDto, filters?: any) {
     const result = await this.notificationsRepository.findByClientId(clientId, {
@@ -35,8 +37,11 @@ export class NotificationsService {
 
   async markAsRead(clientId: string, id: string) {
     // Vérifier que la notification appartient au client
-    const notification = await this.notificationsRepository.findByClientId(clientId, { limit: 1000 });
-    const notificationExists = notification.data.find(n => n.id === id);
+    const notification = await this.notificationsRepository.findByClientId(
+      clientId,
+      { limit: 1000 },
+    );
+    const notificationExists = notification.data.find((n) => n.id === id);
 
     if (!notificationExists) {
       throw new NotFoundException('Notification non trouvée');
@@ -70,4 +75,3 @@ export class NotificationsService {
     };
   }
 }
-

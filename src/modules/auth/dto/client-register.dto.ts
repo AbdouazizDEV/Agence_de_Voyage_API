@@ -1,4 +1,10 @@
-import { IsEmail, IsString, MinLength, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  MinLength,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
@@ -19,7 +25,9 @@ export class ClientRegisterDto {
     minLength: 6,
   })
   @IsString()
-  @MinLength(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' })
+  @MinLength(6, {
+    message: 'Le mot de passe doit contenir au moins 6 caractères',
+  })
   password: string;
 
   @ApiProperty({
@@ -46,4 +54,3 @@ export class ClientRegisterDto {
   @IsString()
   phone?: string;
 }
-

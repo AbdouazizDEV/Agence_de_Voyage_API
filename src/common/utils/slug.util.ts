@@ -17,4 +17,3 @@ export class SlugUtil {
     return suffix ? `${baseSlug}-${suffix}` : baseSlug;
   }
 }
-

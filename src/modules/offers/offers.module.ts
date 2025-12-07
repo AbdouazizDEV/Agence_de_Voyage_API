@@ -14,8 +14,12 @@ import { UploadModule } from '../upload/upload.module';
 @Module({
   imports: [UploadModule],
   controllers: [OffersController, OffersAdminController],
-  providers: [OffersService, OffersRepository, PrismaService, SupabaseStorageService],
+  providers: [
+    OffersService,
+    OffersRepository,
+    PrismaService,
+    SupabaseStorageService,
+  ],
   exports: [OffersService],
 })
 export class OffersModule {}
-

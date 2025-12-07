@@ -1,11 +1,23 @@
-import { IsString, IsNotEmpty, IsNumber, IsEnum, IsBoolean, IsOptional, IsArray, Min, Max, IsDateString, ValidateIf } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsEnum,
+  IsBoolean,
+  IsOptional,
+  IsArray,
+  Min,
+  Max,
+  IsDateString,
+  ValidateIf,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * DTO pour créer une offre avec FormData (pour upload d'images)
  */
 export class CreateOfferFormDto {
-  @ApiProperty({ description: 'Titre de l\'offre', example: 'Séjour à Paris' })
+  @ApiProperty({ description: "Titre de l'offre", example: 'Séjour à Paris' })
   @IsString()
   @IsNotEmpty()
   title: string;
@@ -15,7 +27,11 @@ export class CreateOfferFormDto {
   @IsNotEmpty()
   destination: string;
 
-  @ApiProperty({ description: 'Catégorie (nom de la catégorie, ex: "Vols", "Hôtels", "Croisières", etc.)', example: 'Vols' })
+  @ApiProperty({
+    description:
+      'Catégorie (nom de la catégorie, ex: "Vols", "Hôtels", "Croisières", etc.)',
+    example: 'Vols',
+  })
   @IsString()
   @IsNotEmpty()
   category: string;
@@ -40,17 +56,26 @@ export class CreateOfferFormDto {
   @IsNotEmpty()
   description: string;
 
-  @ApiPropertyOptional({ description: 'Itinéraire (JSON string)', type: String })
+  @ApiPropertyOptional({
+    description: 'Itinéraire (JSON string)',
+    type: String,
+  })
   @IsOptional()
   @IsString()
   itinerary?: string;
 
-  @ApiPropertyOptional({ description: 'Services inclus (JSON string)', type: String })
+  @ApiPropertyOptional({
+    description: 'Services inclus (JSON string)',
+    type: String,
+  })
   @IsOptional()
   @IsString()
   included?: string;
 
-  @ApiPropertyOptional({ description: 'Services exclus (JSON string)', type: String })
+  @ApiPropertyOptional({
+    description: 'Services exclus (JSON string)',
+    type: String,
+  })
   @IsOptional()
   @IsString()
   excluded?: string;
@@ -65,7 +90,11 @@ export class CreateOfferFormDto {
   @IsBoolean()
   is_promotion?: boolean;
 
-  @ApiPropertyOptional({ description: 'Remise promotionnelle (%)', minimum: 0, maximum: 100 })
+  @ApiPropertyOptional({
+    description: 'Remise promotionnelle (%)',
+    minimum: 0,
+    maximum: 100,
+  })
   @ValidateIf((o) => o.is_promotion === true)
   @IsOptional()
   @IsNumber()
@@ -100,9 +129,11 @@ export class CreateOfferFormDto {
   @IsString()
   tags?: string;
 
-  @ApiPropertyOptional({ description: 'Difficulté', enum: ['easy', 'moderate', 'hard'] })
+  @ApiPropertyOptional({
+    description: 'Difficulté',
+    enum: ['easy', 'moderate', 'hard'],
+  })
   @IsOptional()
   @IsEnum(['easy', 'moderate', 'hard'])
   difficulty?: string;
 }
-

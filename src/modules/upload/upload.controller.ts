@@ -11,7 +11,13 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiBody,
+} from '@nestjs/swagger';
 import { UploadService } from './upload.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -29,7 +35,7 @@ export class UploadController {
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Upload d\'image' })
+  @ApiOperation({ summary: "Upload d'image" })
   @ApiBody({
     schema: {
       type: 'object',
@@ -50,7 +56,10 @@ export class UploadController {
     @UploadedFile() file: Express.Multer.File,
     @Body('folder') folder?: string,
   ) {
-    const result = await this.uploadService.uploadFile(file, folder || 'offers');
+    const result = await this.uploadService.uploadFile(
+      file,
+      folder || 'offers',
+    );
     return {
       success: true,
       data: result,
@@ -61,7 +70,7 @@ export class UploadController {
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(FilesInterceptor('files', 10))
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Upload multiple d\'images' })
+  @ApiOperation({ summary: "Upload multiple d'images" })
   @ApiBody({
     schema: {
       type: 'object',
@@ -106,4 +115,3 @@ export class UploadController {
     };
   }
 }
-

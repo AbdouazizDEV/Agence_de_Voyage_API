@@ -10,4 +10,3 @@ export default registerAs('validation', () => ({
   transform: true,
   disableErrorMessages: process.env.NODE_ENV === 'production',
 }));
-

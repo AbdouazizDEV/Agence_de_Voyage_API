@@ -41,4 +41,3 @@ export class ValidationExceptionFilter implements ExceptionFilter {
     response.status(exception.getStatus()).json(errorResponse);
   }
 }
-

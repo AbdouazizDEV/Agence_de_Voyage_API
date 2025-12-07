@@ -9,4 +9,3 @@ export interface Category {
   created_at: Date;
   updated_at: Date;
 }
-

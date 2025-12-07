@@ -49,4 +49,3 @@ export class AuthRepository {
     return admin as Admin;
   }
 }
-

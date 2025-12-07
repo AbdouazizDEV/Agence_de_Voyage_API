@@ -49,4 +49,3 @@ export class ClientRepository {
     return client as Client;
   }
 }
-

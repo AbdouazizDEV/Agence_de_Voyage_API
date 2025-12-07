@@ -10,4 +10,3 @@ export interface IAuthService {
   validateUser(email: string, password: string): Promise<any>;
   refreshToken(refreshToken: string): Promise<AuthResponseDto>;
 }
-

@@ -14,7 +14,14 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiBody,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { CreateOfferFormDto } from './dto/create-offer-form.dto';
@@ -43,15 +50,29 @@ export class OffersAdminController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Liste des offres (Admin)',
-    description: 'Récupère toutes les offres avec pagination et filtres (Admin)',
+    description:
+      'Récupère toutes les offres avec pagination et filtres (Admin)',
   })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 12 })
-  @ApiQuery({ name: 'search', required: false, description: 'Recherche textuelle' })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Recherche textuelle',
+  })
   @ApiQuery({ name: 'category', required: false })
   @ApiQuery({ name: 'isActive', required: false, type: Boolean })
-  async findAll(@Query() pagination: PaginationDto, @Query('search') search?: string, @Query('category') category?: string, @Query('isActive') isActive?: boolean) {
-    return this.offersService.findAll(pagination, { search, category, isActive });
+  async findAll(
+    @Query() pagination: PaginationDto,
+    @Query('search') search?: string,
+    @Query('category') category?: string,
+    @Query('isActive') isActive?: boolean,
+  ) {
+    return this.offersService.findAll(pagination, {
+      search,
+      category,
+      isActive,
+    });
   }
 
   @Post()
@@ -60,7 +81,8 @@ export class OffersAdminController {
   @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Créer une nouvelle offre',
-    description: 'Créer une nouvelle offre de voyage avec upload d\'images (Admin uniquement)',
+    description:
+      "Créer une nouvelle offre de voyage avec upload d'images (Admin uniquement)",
   })
   @ApiBody({
     schema: {
@@ -98,7 +120,7 @@ export class OffersAdminController {
   ) {
     // Parser les JSON strings
     const parsedData: any = { ...createDto };
-    
+
     if (createDto.itinerary) {
       try {
         parsedData.itinerary = JSON.parse(createDto.itinerary);
@@ -140,7 +162,8 @@ export class OffersAdminController {
   @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Mettre à jour une offre',
-    description: 'Mettre à jour une offre existante avec upload d\'images optionnel (Admin uniquement)',
+    description:
+      "Mettre à jour une offre existante avec upload d'images optionnel (Admin uniquement)",
   })
   @ApiBody({
     schema: {
@@ -159,7 +182,8 @@ export class OffersAdminController {
         images_action: {
           type: 'string',
           enum: ['add', 'replace'],
-          description: 'Action pour les images: "add" (ajouter aux existantes) ou "replace" (remplacer toutes). Par défaut: "add"',
+          description:
+            'Action pour les images: "add" (ajouter aux existantes) ou "replace" (remplacer toutes). Par défaut: "add"',
           default: 'add',
         },
         itinerary: { type: 'string', description: 'JSON string' },
@@ -186,42 +210,53 @@ export class OffersAdminController {
   ) {
     // Transformer les types FormData (tout arrive en string)
     const parsedData: any = { ...updateDto };
-    
+
     // Convertir les nombres
     if (updateDto.price !== undefined) {
-      parsedData.price = typeof updateDto.price === 'string' ? parseFloat(updateDto.price) : updateDto.price;
+      parsedData.price =
+        typeof updateDto.price === 'string'
+          ? parseFloat(updateDto.price)
+          : updateDto.price;
     }
     if (updateDto.duration !== undefined) {
-      parsedData.duration = typeof updateDto.duration === 'string' ? parseInt(updateDto.duration, 10) : updateDto.duration;
+      parsedData.duration =
+        typeof updateDto.duration === 'string'
+          ? parseInt(updateDto.duration, 10)
+          : updateDto.duration;
     }
     if (updateDto.promotion_discount !== undefined) {
-      parsedData.promotion_discount = typeof updateDto.promotion_discount === 'string' 
-        ? parseFloat(updateDto.promotion_discount) 
-        : updateDto.promotion_discount;
+      parsedData.promotion_discount =
+        typeof updateDto.promotion_discount === 'string'
+          ? parseFloat(updateDto.promotion_discount)
+          : updateDto.promotion_discount;
     }
     if (updateDto.available_seats !== undefined) {
-      parsedData.available_seats = typeof updateDto.available_seats === 'string' 
-        ? parseInt(updateDto.available_seats, 10) 
-        : updateDto.available_seats;
+      parsedData.available_seats =
+        typeof updateDto.available_seats === 'string'
+          ? parseInt(updateDto.available_seats, 10)
+          : updateDto.available_seats;
     }
     if (updateDto.max_capacity !== undefined) {
-      parsedData.max_capacity = typeof updateDto.max_capacity === 'string' 
-        ? parseInt(updateDto.max_capacity, 10) 
-        : updateDto.max_capacity;
+      parsedData.max_capacity =
+        typeof updateDto.max_capacity === 'string'
+          ? parseInt(updateDto.max_capacity, 10)
+          : updateDto.max_capacity;
     }
 
     // Convertir les booléens
     if (updateDto.is_active !== undefined) {
-      parsedData.is_active = typeof updateDto.is_active === 'string' 
-        ? updateDto.is_active === 'true' || updateDto.is_active === '1' 
-        : updateDto.is_active;
+      parsedData.is_active =
+        typeof updateDto.is_active === 'string'
+          ? updateDto.is_active === 'true' || updateDto.is_active === '1'
+          : updateDto.is_active;
     }
     if (updateDto.is_promotion !== undefined) {
-      parsedData.is_promotion = typeof updateDto.is_promotion === 'string' 
-        ? updateDto.is_promotion === 'true' || updateDto.is_promotion === '1' 
-        : updateDto.is_promotion;
+      parsedData.is_promotion =
+        typeof updateDto.is_promotion === 'string'
+          ? updateDto.is_promotion === 'true' || updateDto.is_promotion === '1'
+          : updateDto.is_promotion;
     }
-    
+
     // Parser les JSON strings
     if (updateDto.itinerary) {
       try {
@@ -257,10 +292,17 @@ export class OffersAdminController {
     }
 
     // Extraire images_action pour le passer au service
-    const imagesAction = (parsedData.images_action || 'add') as 'add' | 'replace';
+    const imagesAction = (parsedData.images_action || 'add') as
+      | 'add'
+      | 'replace';
     delete parsedData.images_action;
 
-    return this.offersService.update(id, parsedData as UpdateOfferDto, images, imagesAction);
+    return this.offersService.update(
+      id,
+      parsedData as UpdateOfferDto,
+      images,
+      imagesAction,
+    );
   }
 
   @Delete(':id')
@@ -277,7 +319,7 @@ export class OffersAdminController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Activer/Désactiver une offre',
-    description: 'Basculer le statut actif/inactif d\'une offre',
+    description: "Basculer le statut actif/inactif d'une offre",
   })
   async toggleStatus(@Param('id') id: string) {
     return this.offersService.toggleStatus(id);
@@ -287,10 +329,9 @@ export class OffersAdminController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Dupliquer une offre',
-    description: 'Créer une copie d\'une offre existante',
+    description: "Créer une copie d'une offre existante",
   })
   async duplicate(@Param('id') id: string) {
     return this.offersService.duplicate(id);
   }
 }
-

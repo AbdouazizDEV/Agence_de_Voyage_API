@@ -16,4 +16,3 @@ export interface Payment {
   created_at: Date;
   updated_at: Date;
 }
-

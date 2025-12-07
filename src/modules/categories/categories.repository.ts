@@ -69,9 +69,13 @@ export class CategoriesRepository {
       data: {
         ...(updateData.name && { name: updateData.name }),
         ...(updateData.slug && { slug: updateData.slug }),
-        ...(updateData.description !== undefined && { description: updateData.description }),
+        ...(updateData.description !== undefined && {
+          description: updateData.description,
+        }),
         ...(updateData.icon !== undefined && { icon: updateData.icon }),
-        ...(updateData.displayOrder !== undefined && { display_order: updateData.displayOrder }),
+        ...(updateData.displayOrder !== undefined && {
+          display_order: updateData.displayOrder,
+        }),
       },
     });
 
@@ -103,4 +107,3 @@ export class CategoriesRepository {
     return updated as Category;
   }
 }
-

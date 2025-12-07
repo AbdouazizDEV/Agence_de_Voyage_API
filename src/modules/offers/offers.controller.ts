@@ -62,7 +62,13 @@ export class OffersController {
   @ApiStandardResponse(OfferResponseDto, true)
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 12 })
-  @ApiQuery({ name: 'search', required: false, type: String, description: 'Recherche textuelle (titre, description, destination). Supporte les débuts de mots.' })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description:
+      'Recherche textuelle (titre, description, destination). Supporte les débuts de mots.',
+  })
   @ApiQuery({ name: 'category', required: false, type: String })
   @ApiQuery({ name: 'destination', required: false, type: String })
   @ApiQuery({ name: 'minPrice', required: false, type: Number })
@@ -70,13 +76,26 @@ export class OffersController {
   @ApiQuery({ name: 'minDuration', required: false, type: Number })
   @ApiQuery({ name: 'maxDuration', required: false, type: Number })
   @ApiQuery({ name: 'minRating', required: false, type: Number })
-  @ApiQuery({ name: 'difficulty', required: false, enum: ['easy', 'moderate', 'hard'] })
-  @ApiQuery({ name: 'tags', required: false, type: String, description: 'Tags séparés par virgule (ex: "plage,romantique")' })
+  @ApiQuery({
+    name: 'difficulty',
+    required: false,
+    enum: ['easy', 'moderate', 'hard'],
+  })
+  @ApiQuery({
+    name: 'tags',
+    required: false,
+    type: String,
+    description: 'Tags séparés par virgule (ex: "plage,romantique")',
+  })
   @ApiQuery({ name: 'departureDate', required: false, type: String })
   @ApiQuery({ name: 'returnDate', required: false, type: String })
   @ApiQuery({ name: 'travelers', required: false, type: Number })
   @ApiQuery({ name: 'isPromotion', required: false, type: Boolean })
-  @ApiQuery({ name: 'sortBy', required: false, enum: ['price', 'duration', 'rating', 'createdAt', 'bookings', 'views'] })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    enum: ['price', 'duration', 'rating', 'createdAt', 'bookings', 'views'],
+  })
   @ApiQuery({ name: 'sortOrder', required: false, enum: ['asc', 'desc'] })
   async findAll(@Query() query: any) {
     // Extraire la pagination
@@ -96,18 +115,22 @@ export class OffersController {
       ...(query.maxDuration && { maxDuration: parseInt(query.maxDuration) }),
       ...(query.minRating && { minRating: parseFloat(query.minRating) }),
       ...(query.difficulty && { difficulty: query.difficulty }),
-      ...(query.tags && { tags: query.tags.split(',').map((t: string) => t.trim()) }),
+      ...(query.tags && {
+        tags: query.tags.split(',').map((t: string) => t.trim()),
+      }),
       ...(query.departureDate && { departureDate: query.departureDate }),
       ...(query.returnDate && { returnDate: query.returnDate }),
       ...(query.travelers && { travelers: parseInt(query.travelers) }),
-      ...(query.isPromotion !== undefined && { isPromotion: query.isPromotion === 'true' }),
+      ...(query.isPromotion !== undefined && {
+        isPromotion: query.isPromotion === 'true',
+      }),
       ...(query.sortBy && { sortBy: query.sortBy }),
       ...(query.sortOrder && { sortOrder: query.sortOrder }),
     };
 
     // Si des filtres avancés sont présents, utiliser la recherche
     const hasAdvancedFilters = Object.keys(filters).length > 0;
-    
+
     if (hasAdvancedFilters) {
       return this.offersService.search({
         ...filters,
@@ -124,8 +147,8 @@ export class OffersController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Détails d\'une offre',
-    description: 'Récupère les détails complets d\'une offre par son ID',
+    summary: "Détails d'une offre",
+    description: "Récupère les détails complets d'une offre par son ID",
   })
   @ApiStandardResponse(OfferResponseDto)
   async findOne(@Param('id') id: string) {
@@ -136,7 +159,7 @@ export class OffersController {
   @Post('search')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Recherche avancée d\'offres',
+    summary: "Recherche avancée d'offres",
     description: `
       Effectue une recherche avancée avec plusieurs critères combinables:
       
@@ -215,16 +238,21 @@ export class OffersController {
   @Get('suggestions')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Suggestions d\'offres',
+    summary: "Suggestions d'offres",
     description: `
       Récupère des suggestions d'offres basées sur différents critères.
       Retourne des offres populaires, en promotion, et récentes.
     `,
   })
-  @ApiQuery({ name: 'limit', required: false, type: Number, example: 6, description: 'Nombre de suggestions (défaut: 6)' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    example: 6,
+    description: 'Nombre de suggestions (défaut: 6)',
+  })
   @ApiStandardResponse(OfferResponseDto, true)
   async suggestions(@Query('limit') limit?: number) {
     return this.offersService.getSuggestions(limit || 6);
   }
 }
-

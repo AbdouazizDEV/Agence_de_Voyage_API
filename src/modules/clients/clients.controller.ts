@@ -11,7 +11,12 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -34,18 +39,29 @@ export class ClientsController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Liste des clients', description: 'Récupère tous les clients avec pagination' })
+  @ApiOperation({
+    summary: 'Liste des clients',
+    description: 'Récupère tous les clients avec pagination',
+  })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 12 })
-  @ApiQuery({ name: 'search', required: false, description: 'Recherche par email, nom, prénom' })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Recherche par email, nom, prénom',
+  })
   @ApiQuery({ name: 'isActive', required: false, type: Boolean })
-  async findAll(@Query() pagination: PaginationDto, @Query('search') search?: string, @Query('isActive') isActive?: boolean) {
+  async findAll(
+    @Query() pagination: PaginationDto,
+    @Query('search') search?: string,
+    @Query('isActive') isActive?: boolean,
+  ) {
     return this.clientsService.findAll(pagination, { search, isActive });
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Détails d\'un client' })
+  @ApiOperation({ summary: "Détails d'un client" })
   async findOne(@Param('id') id: string) {
     return this.clientsService.findOne(id);
   }
@@ -78,4 +94,3 @@ export class ClientsController {
     return this.clientsService.toggleStatus(id);
   }
 }
-

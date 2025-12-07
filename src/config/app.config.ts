@@ -12,4 +12,3 @@ export default registerAs('app', () => ({
   apiPrefix: process.env.API_PREFIX || 'api',
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
 }));
-

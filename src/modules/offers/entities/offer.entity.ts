@@ -33,4 +33,3 @@ export interface Offer {
   created_at: Date;
   updated_at: Date;
 }
-

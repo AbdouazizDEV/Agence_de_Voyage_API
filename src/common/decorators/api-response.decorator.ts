@@ -51,7 +51,10 @@ export const ApiStandardResponse = <TModel extends Type<any>>(
             type: 'object',
             properties: {
               code: { type: 'string', example: 'UNAUTHORIZED' },
-              message: { type: 'string', example: 'Token invalide ou manquant' },
+              message: {
+                type: 'string',
+                example: 'Token invalide ou manquant',
+              },
             },
           },
         },
@@ -59,4 +62,3 @@ export const ApiStandardResponse = <TModel extends Type<any>>(
     }),
   );
 };
-

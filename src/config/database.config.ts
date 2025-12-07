@@ -9,4 +9,3 @@ export default registerAs('database', () => ({
   supabaseKey: process.env.SUPABASE_KEY,
   supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY,
 }));
-

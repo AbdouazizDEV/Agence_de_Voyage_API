@@ -10,7 +10,10 @@ export class CreateCategoryDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiPropertyOptional({ description: 'Description', example: 'Billets d\'avion uniquement' })
+  @ApiPropertyOptional({
+    description: 'Description',
+    example: "Billets d'avion uniquement",
+  })
   @IsOptional()
   @IsString()
   description?: string;
@@ -20,10 +23,13 @@ export class CreateCategoryDto {
   @IsString()
   icon?: string;
 
-  @ApiPropertyOptional({ description: 'Ordre d\'affichage', example: 1, default: 0 })
+  @ApiPropertyOptional({
+    description: "Ordre d'affichage",
+    example: 1,
+    default: 0,
+  })
   @IsOptional()
   @IsInt()
   @Min(0)
   displayOrder?: number;
 }
-

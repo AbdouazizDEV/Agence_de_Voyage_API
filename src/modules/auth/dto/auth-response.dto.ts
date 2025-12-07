@@ -18,7 +18,7 @@ export class AuthResponseDto {
   refreshToken: string;
 
   @ApiProperty({
-    description: 'Informations de l\'utilisateur',
+    description: "Informations de l'utilisateur",
     example: {
       id: 'uuid',
       email: 'admin@travel-agency.com',
@@ -35,4 +35,3 @@ export class AuthResponseDto {
     role: string;
   };
 }
-

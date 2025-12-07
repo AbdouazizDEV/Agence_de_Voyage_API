@@ -7,7 +7,7 @@ import { ApiProperty } from '@nestjs/swagger';
  */
 export class RegisterDto {
   @ApiProperty({
-    description: 'Email de l\'administrateur',
+    description: "Email de l'administrateur",
     example: 'admin@travel-agency.com',
   })
   @IsEmail({}, { message: 'Email invalide' })
@@ -20,7 +20,9 @@ export class RegisterDto {
     minLength: 6,
   })
   @IsString()
-  @MinLength(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' })
+  @MinLength(6, {
+    message: 'Le mot de passe doit contenir au moins 6 caractères',
+  })
   password: string;
 
   @ApiProperty({
@@ -48,4 +50,3 @@ export class RegisterDto {
   @IsString()
   role?: string;
 }
-

@@ -28,4 +28,3 @@ export const DIFFICULTY_LEVELS = {
   MODERATE: 'moderate',
   HARD: 'hard',
 } as const;
-

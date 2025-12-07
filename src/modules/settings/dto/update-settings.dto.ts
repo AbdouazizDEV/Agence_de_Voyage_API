@@ -5,7 +5,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
  * DTO pour mettre à jour les paramètres
  */
 export class UpdateSettingsDto {
-  @ApiPropertyOptional({ description: 'Nom de l\'entreprise' })
+  @ApiPropertyOptional({ description: "Nom de l'entreprise" })
   @IsOptional()
   @IsString()
   companyName?: string;
@@ -50,4 +50,3 @@ export class UpdateSettingsDto {
   @IsBoolean()
   whatsappEnabled?: boolean;
 }
-

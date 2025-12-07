@@ -26,4 +26,3 @@ export class JwtClientGuard extends AuthGuard('jwt-client') {
     return super.canActivate(context);
   }
 }
-

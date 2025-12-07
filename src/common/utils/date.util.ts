@@ -28,4 +28,3 @@ export class DateUtil {
     return isValid(dateObj) && dateObj < new Date();
   }
 }
-

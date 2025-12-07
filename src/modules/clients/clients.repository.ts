@@ -13,7 +13,10 @@ import { Prisma } from '@prisma/client';
 export class ClientsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(pagination: PaginationDto, filters?: any): Promise<{ data: Client[]; total: number }> {
+  async findAll(
+    pagination: PaginationDto,
+    filters?: any,
+  ): Promise<{ data: Client[]; total: number }> {
     const { page = 1, limit = 12 } = pagination;
     const skip = (page - 1) * limit;
 
@@ -114,4 +117,3 @@ export class ClientsRepository {
     return updated as Client;
   }
 }
-

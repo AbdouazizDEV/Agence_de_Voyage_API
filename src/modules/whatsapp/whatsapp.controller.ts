@@ -14,7 +14,8 @@ export class WhatsAppController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Générer un lien WhatsApp',
-    description: 'Génère un lien WhatsApp pour contacter l\'agence à propos d\'une offre',
+    description:
+      "Génère un lien WhatsApp pour contacter l'agence à propos d'une offre",
   })
   async generateLink(@Body() dto: GenerateMessageDto) {
     const link = await this.whatsappService.generateWhatsAppLink(dto);
@@ -24,4 +25,3 @@ export class WhatsAppController {
     };
   }
 }
-

@@ -85,8 +85,11 @@ export class OffersService {
     let imageUrls: string[] = [];
     if (images && images.length > 0) {
       try {
-        const uploaded = await this.supabaseStorage.uploadMultipleFiles(images, 'offers');
-        imageUrls = uploaded.map(img => img.url);
+        const uploaded = await this.supabaseStorage.uploadMultipleFiles(
+          images,
+          'offers',
+        );
+        imageUrls = uploaded.map((img) => img.url);
       } catch (error) {
         console.error('Erreur upload images:', error);
         // Continuer sans images si l'upload échoue
@@ -94,7 +97,8 @@ export class OffersService {
     }
 
     // Utiliser les images uploadées ou celles fournies dans le DTO
-    const finalImages = imageUrls.length > 0 ? imageUrls : (createDto.images || []);
+    const finalImages =
+      imageUrls.length > 0 ? imageUrls : createDto.images || [];
 
     const offer = await this.offersRepository.create({
       ...createDto,
@@ -150,16 +154,22 @@ export class OffersService {
     // Upload des nouvelles images si fournies
     if (images && images.length > 0) {
       try {
-        const uploaded = await this.supabaseStorage.uploadMultipleFiles(images, 'offers');
-        const newImageUrls = uploaded.map(img => img.url);
-        
+        const uploaded = await this.supabaseStorage.uploadMultipleFiles(
+          images,
+          'offers',
+        );
+        const newImageUrls = uploaded.map((img) => img.url);
+
         // Gérer l'action sur les images : ajouter ou remplacer
         if (imagesAction === 'replace') {
           // Remplacer toutes les images existantes par les nouvelles
           updateData.images = newImageUrls;
         } else {
           // Ajouter les nouvelles images aux existantes (par défaut)
-          updateData.images = [...(existingOffer.images || []), ...newImageUrls];
+          updateData.images = [
+            ...(existingOffer.images || []),
+            ...newImageUrls,
+          ];
         }
       } catch (error) {
         console.error('Erreur upload images:', error);
@@ -167,7 +177,7 @@ export class OffersService {
         // Mais on peut optionnellement lancer une erreur
         throw new BadRequestException({
           code: ERROR_CODES.VALIDATION_ERROR,
-          message: 'Erreur lors de l\'upload des images',
+          message: "Erreur lors de l'upload des images",
         });
       }
     } else if (updateDto.images !== undefined) {
@@ -269,7 +279,7 @@ export class OffersService {
         id: updated.id,
         isActive: updated.is_active,
       },
-      message: 'Statut de l\'offre modifié',
+      message: "Statut de l'offre modifié",
     };
   }
 
@@ -307,4 +317,3 @@ export class OffersService {
     };
   }
 }
-

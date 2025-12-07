@@ -13,4 +13,3 @@ export interface Admin {
   created_at: Date;
   updated_at: Date;
 }
-

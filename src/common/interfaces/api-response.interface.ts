@@ -18,4 +18,3 @@ export interface IApiResponse<T = any> {
     totalPages: number;
   };
 }
-

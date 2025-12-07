@@ -32,7 +32,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const responseObj = exceptionResponse as any;
         message = responseObj.message || exception.message;
         // Support à la fois 'code' et 'errorCode' pour compatibilité
-        errorCode = responseObj.code || responseObj.errorCode || this.getErrorCodeFromStatus(status);
+        errorCode =
+          responseObj.code ||
+          responseObj.errorCode ||
+          this.getErrorCodeFromStatus(status);
         details = responseObj.details || null;
       } else {
         message = exceptionResponse as string;
@@ -73,4 +76,3 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
   }
 }
-

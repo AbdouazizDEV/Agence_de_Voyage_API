@@ -9,4 +9,3 @@ export interface IBaseRepository<T> {
   update(id: string, data: Partial<T>): Promise<T>;
   delete(id: string): Promise<boolean>;
 }
-

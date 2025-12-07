@@ -23,7 +23,9 @@ export class OffersRepository {
     const skip = (page - 1) * limit;
 
     const where: Prisma.OfferWhereInput = {
-      ...(filters?.isActive !== undefined ? { is_active: filters.isActive } : { is_active: true }),
+      ...(filters?.isActive !== undefined
+        ? { is_active: filters.isActive }
+        : { is_active: true }),
       ...(filters?.category && { category: filters.category }),
       ...(filters?.minPrice && { price: { gte: filters.minPrice } }),
       ...(filters?.maxPrice && { price: { lte: filters.maxPrice } }),
@@ -58,7 +60,7 @@ export class OffersRepository {
       where: { id },
     });
 
-    return offer ? this.mapPrismaToOffer(offer) as Offer : null;
+    return offer ? (this.mapPrismaToOffer(offer) as Offer) : null;
   }
 
   async create(createDto: CreateOfferDto): Promise<Offer> {
@@ -89,7 +91,9 @@ export class OffersRepository {
     }
   }
 
-  async search(searchDto: SearchOfferDto): Promise<{ data: Offer[]; total: number }> {
+  async search(
+    searchDto: SearchOfferDto,
+  ): Promise<{ data: Offer[]; total: number }> {
     const page = searchDto.page || 1;
     const limit = searchDto.limit || 12;
     const skip = (page - 1) * limit;
@@ -105,17 +109,24 @@ export class OffersRepository {
         ],
       }),
       // Recherche spécifique par destination (si pas de recherche générale)
-      ...(!searchDto.search && searchDto.destination && {
-        destination: { contains: searchDto.destination, mode: 'insensitive' },
-      }),
+      ...(!searchDto.search &&
+        searchDto.destination && {
+          destination: { contains: searchDto.destination, mode: 'insensitive' },
+        }),
       ...(searchDto.category && { category: searchDto.category }),
       ...(searchDto.minPrice && { price: { gte: searchDto.minPrice } }),
       ...(searchDto.maxPrice && { price: { lte: searchDto.maxPrice } }),
-      ...(searchDto.isPromotion !== undefined && { is_promotion: searchDto.isPromotion }),
+      ...(searchDto.isPromotion !== undefined && {
+        is_promotion: searchDto.isPromotion,
+      }),
       ...(searchDto.difficulty && { difficulty: searchDto.difficulty }),
       ...(searchDto.minRating && { rating: { gte: searchDto.minRating } }),
-      ...(searchDto.minDuration && { duration: { gte: searchDto.minDuration } }),
-      ...(searchDto.maxDuration && { duration: { lte: searchDto.maxDuration } }),
+      ...(searchDto.minDuration && {
+        duration: { gte: searchDto.minDuration },
+      }),
+      ...(searchDto.maxDuration && {
+        duration: { lte: searchDto.maxDuration },
+      }),
       ...(searchDto.departureDate && {
         departure_date: { gte: new Date(searchDto.departureDate) },
       }),
@@ -129,9 +140,10 @@ export class OffersRepository {
           { max_capacity: null }, // Si pas de limite de capacité
         ],
       }),
-      ...(searchDto.tags && searchDto.tags.length > 0 && {
-        tags: { hasEvery: searchDto.tags },
-      }),
+      ...(searchDto.tags &&
+        searchDto.tags.length > 0 && {
+          tags: { hasEvery: searchDto.tags },
+        }),
     };
 
     // Déterminer l'ordre de tri
@@ -229,24 +241,24 @@ export class OffersRepository {
     // Combiner et dédupliquer par ID
     const allOffers = [...promotions, ...popular, ...recent];
     const uniqueOffers = Array.from(
-      new Map(allOffers.map(offer => [offer.id, offer])).values()
+      new Map(allOffers.map((offer) => [offer.id, offer])).values(),
     );
 
     // Limiter au nombre demandé
-    return uniqueOffers
-      .slice(0, limit)
-      .map(this.mapPrismaToOffer) as Offer[];
+    return uniqueOffers.slice(0, limit).map(this.mapPrismaToOffer) as Offer[];
   }
 
   private mapPrismaToOffer(offer: any): any {
     return {
       ...offer,
-      price: typeof offer.price === 'object' && offer.price !== null 
-        ? parseFloat(offer.price.toString()) 
-        : offer.price,
-      rating: typeof offer.rating === 'object' && offer.rating !== null 
-        ? parseFloat(offer.rating.toString()) 
-        : offer.rating,
+      price:
+        typeof offer.price === 'object' && offer.price !== null
+          ? parseFloat(offer.price.toString())
+          : offer.price,
+      rating:
+        typeof offer.rating === 'object' && offer.rating !== null
+          ? parseFloat(offer.rating.toString())
+          : offer.rating,
     };
   }
 }

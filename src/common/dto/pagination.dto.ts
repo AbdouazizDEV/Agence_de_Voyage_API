@@ -20,7 +20,7 @@ export class PaginationDto {
   page?: number = 1;
 
   @ApiPropertyOptional({
-    description: 'Nombre d\'éléments par page',
+    description: "Nombre d'éléments par page",
     example: 12,
     minimum: 1,
     maximum: 100,
@@ -33,4 +33,3 @@ export class PaginationDto {
   @Max(100)
   limit?: number = 12;
 }
-

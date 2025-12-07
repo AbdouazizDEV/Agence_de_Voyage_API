@@ -49,7 +49,11 @@ export class PaymentsRepository {
     return this.mapPrismaToPayment(payment);
   }
 
-  async refund(id: string, refundAmount: number, reason?: string): Promise<Payment> {
+  async refund(
+    id: string,
+    refundAmount: number,
+    reason?: string,
+  ): Promise<Payment> {
     const payment = await this.prisma.payment.update({
       where: { id },
       data: {
@@ -66,13 +70,14 @@ export class PaymentsRepository {
   private mapPrismaToPayment(payment: any): Payment {
     return {
       ...payment,
-      amount: typeof payment.amount === 'object' && payment.amount !== null
-        ? parseFloat(payment.amount.toString())
-        : payment.amount,
-      refund_amount: payment.refund_amount && typeof payment.refund_amount === 'object'
-        ? parseFloat(payment.refund_amount.toString())
-        : payment.refund_amount,
+      amount:
+        typeof payment.amount === 'object' && payment.amount !== null
+          ? parseFloat(payment.amount.toString())
+          : payment.amount,
+      refund_amount:
+        payment.refund_amount && typeof payment.refund_amount === 'object'
+          ? parseFloat(payment.refund_amount.toString())
+          : payment.refund_amount,
     };
   }
 }
-

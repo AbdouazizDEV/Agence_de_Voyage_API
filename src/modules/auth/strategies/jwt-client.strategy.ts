@@ -8,7 +8,10 @@ import { ConfigService } from '@nestjs/config';
  * Principe SOLID : Single Responsibility - Gère uniquement la validation JWT client
  */
 @Injectable()
-export class JwtClientStrategy extends PassportStrategy(Strategy, 'jwt-client') {
+export class JwtClientStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-client',
+) {
   constructor(private configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -34,4 +37,3 @@ export class JwtClientStrategy extends PassportStrategy(Strategy, 'jwt-client') 
     };
   }
 }
-

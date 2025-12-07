@@ -42,7 +42,7 @@ export class ReservationsService {
     if (!offer.is_active) {
       throw new BadRequestException({
         code: ERROR_CODES.VALIDATION_ERROR,
-        message: 'Cette offre n\'est plus disponible',
+        message: "Cette offre n'est plus disponible",
       });
     }
 
@@ -54,7 +54,10 @@ export class ReservationsService {
       });
     }
 
-    if (createDto.numberOfGuests > offer.available_seats && offer.available_seats > 0) {
+    if (
+      createDto.numberOfGuests > offer.available_seats &&
+      offer.available_seats > 0
+    ) {
       throw new BadRequestException({
         code: ERROR_CODES.VALIDATION_ERROR,
         message: `Places insuffisantes. Places disponibles: ${offer.available_seats}`,
@@ -62,7 +65,8 @@ export class ReservationsService {
     }
 
     // Calculer le montant total
-    let totalAmount = parseFloat(offer.price.toString()) * createDto.numberOfGuests;
+    let totalAmount =
+      parseFloat(offer.price.toString()) * createDto.numberOfGuests;
 
     // Appliquer la réduction si promotion
     if (offer.is_promotion && offer.promotion_discount) {
@@ -78,12 +82,16 @@ export class ReservationsService {
       total_amount: totalAmount,
       currency: offer.currency,
       reservation_date: new Date(),
-      departure_date: createDto.departureDate 
-        ? new Date(createDto.departureDate) 
-        : (offer.departure_date ? new Date(offer.departure_date) : undefined),
-      return_date: createDto.returnDate 
-        ? new Date(createDto.returnDate) 
-        : (offer.return_date ? new Date(offer.return_date) : undefined),
+      departure_date: createDto.departureDate
+        ? new Date(createDto.departureDate)
+        : offer.departure_date
+          ? new Date(offer.departure_date)
+          : undefined,
+      return_date: createDto.returnDate
+        ? new Date(createDto.returnDate)
+        : offer.return_date
+          ? new Date(offer.return_date)
+          : undefined,
       special_requests: createDto.specialRequests,
     });
 
@@ -153,7 +161,7 @@ export class ReservationsService {
     if (reservation.client_id !== clientId) {
       throw new ForbiddenException({
         code: ERROR_CODES.FORBIDDEN,
-        message: 'Vous n\'avez pas accès à cette réservation',
+        message: "Vous n'avez pas accès à cette réservation",
       });
     }
 
@@ -177,7 +185,7 @@ export class ReservationsService {
     if (reservation.client_id !== clientId) {
       throw new ForbiddenException({
         code: ERROR_CODES.FORBIDDEN,
-        message: 'Vous n\'avez pas accès à cette réservation',
+        message: "Vous n'avez pas accès à cette réservation",
       });
     }
 
@@ -192,12 +200,15 @@ export class ReservationsService {
     if (reservation.status === 'completed') {
       throw new BadRequestException({
         code: ERROR_CODES.VALIDATION_ERROR,
-        message: 'Impossible d\'annuler une réservation complétée',
+        message: "Impossible d'annuler une réservation complétée",
       });
     }
 
     // Annuler la réservation
-    const cancelledReservation = await this.reservationsRepository.cancel(id, cancelDto.reason);
+    const cancelledReservation = await this.reservationsRepository.cancel(
+      id,
+      cancelDto.reason,
+    );
 
     // Rembourser les paiements
     const payments = await this.paymentsRepository.findByReservationId(id);
@@ -240,7 +251,9 @@ export class ReservationsService {
 
   async createPayment(clientId: string, createDto: CreatePaymentDto) {
     // Vérifier que la réservation existe et appartient au client
-    const reservation = await this.reservationsRepository.findById(createDto.reservationId);
+    const reservation = await this.reservationsRepository.findById(
+      createDto.reservationId,
+    );
 
     if (!reservation) {
       throw new NotFoundException({
@@ -252,7 +265,7 @@ export class ReservationsService {
     if (reservation.client_id !== clientId) {
       throw new ForbiddenException({
         code: ERROR_CODES.FORBIDDEN,
-        message: 'Vous n\'avez pas accès à cette réservation',
+        message: "Vous n'avez pas accès à cette réservation",
       });
     }
 
@@ -264,8 +277,12 @@ export class ReservationsService {
     }
 
     // Vérifier si un paiement existe déjà
-    const existingPayments = await this.paymentsRepository.findByReservationId(createDto.reservationId);
-    const completedPayment = existingPayments.find(p => p.status === 'completed');
+    const existingPayments = await this.paymentsRepository.findByReservationId(
+      createDto.reservationId,
+    );
+    const completedPayment = existingPayments.find(
+      (p) => p.status === 'completed',
+    );
 
     if (completedPayment) {
       throw new BadRequestException({
@@ -275,7 +292,9 @@ export class ReservationsService {
     }
 
     // Générer un ID de transaction simulé
-    const transactionId = createDto.transactionId || `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const transactionId =
+      createDto.transactionId ||
+      `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     // Simuler le paiement (toujours réussi pour la démo)
     const payment = await this.paymentsRepository.create({
@@ -293,9 +312,12 @@ export class ReservationsService {
     });
 
     // Mettre à jour le statut de la réservation
-    const updatedReservation = await this.reservationsRepository.update(createDto.reservationId, {
-      status: 'confirmed',
-    });
+    const updatedReservation = await this.reservationsRepository.update(
+      createDto.reservationId,
+      {
+        status: 'confirmed',
+      },
+    );
 
     // Créer une notification
     await this.notificationsRepository.create({
@@ -318,7 +340,8 @@ export class ReservationsService {
 
   async getPayments(clientId: string, reservationId: string) {
     // Vérifier que la réservation existe et appartient au client
-    const reservation = await this.reservationsRepository.findById(reservationId);
+    const reservation =
+      await this.reservationsRepository.findById(reservationId);
 
     if (!reservation) {
       throw new NotFoundException({
@@ -330,11 +353,12 @@ export class ReservationsService {
     if (reservation.client_id !== clientId) {
       throw new ForbiddenException({
         code: ERROR_CODES.FORBIDDEN,
-        message: 'Vous n\'avez pas accès à cette réservation',
+        message: "Vous n'avez pas accès à cette réservation",
       });
     }
 
-    const payments = await this.paymentsRepository.findByReservationId(reservationId);
+    const payments =
+      await this.paymentsRepository.findByReservationId(reservationId);
 
     return {
       success: true,
@@ -342,4 +366,3 @@ export class ReservationsService {
     };
   }
 }
-

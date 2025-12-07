@@ -11,7 +11,12 @@ import {
   HttpStatus,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -33,15 +38,23 @@ export class CategoriesAdminController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Liste des catégories (Admin)', description: 'Récupère toutes les catégories, y compris inactives' })
-  @ApiQuery({ name: 'includeInactive', required: false, type: Boolean, description: 'Inclure les catégories inactives' })
+  @ApiOperation({
+    summary: 'Liste des catégories (Admin)',
+    description: 'Récupère toutes les catégories, y compris inactives',
+  })
+  @ApiQuery({
+    name: 'includeInactive',
+    required: false,
+    type: Boolean,
+    description: 'Inclure les catégories inactives',
+  })
   async findAll(@Query('includeInactive') includeInactive?: boolean) {
     return this.categoriesService.findAll(includeInactive === true);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Détails d\'une catégorie' })
+  @ApiOperation({ summary: "Détails d'une catégorie" })
   async findOne(@Param('id') id: string) {
     return this.categoriesService.findOne(id);
   }
@@ -74,4 +87,3 @@ export class CategoriesAdminController {
     return this.categoriesService.toggleStatus(id);
   }
 }
-

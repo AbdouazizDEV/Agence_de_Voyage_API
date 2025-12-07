@@ -21,7 +21,8 @@ import { PrismaService } from '../../database/prisma.service';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService): any => {
-        const secret = configService.get<string>('JWT_SECRET') || 'default-secret';
+        const secret =
+          configService.get<string>('JWT_SECRET') || 'default-secret';
         const expiresIn = configService.get<string>('JWT_EXPIRES_IN', '24h');
         return {
           secret,
@@ -46,4 +47,3 @@ import { PrismaService } from '../../database/prisma.service';
   exports: [AuthService, ClientAuthService, JwtModule],
 })
 export class AuthModule {}
-

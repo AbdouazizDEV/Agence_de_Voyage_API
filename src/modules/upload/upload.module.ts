@@ -9,4 +9,3 @@ import { SupabaseStorageService } from '../../database/supabase-storage.service'
   exports: [UploadService],
 })
 export class UploadModule {}
-
