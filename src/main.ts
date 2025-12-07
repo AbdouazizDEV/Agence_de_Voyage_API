@@ -22,9 +22,9 @@ async function bootstrap() {
   // Configuration flexible pour autoriser Swagger et le frontend
   const corsOrigin = configService.get<string>('CORS_ORIGIN');
   const nodeEnv = configService.get<string>('NODE_ENV', 'development');
-
+  
   // Déterminer les origines autorisées
-  const allowedOrigins: string | boolean = (() => {
+  const allowedOrigins: string | boolean | string[] = (() => {
     // En production, si CORS_ORIGIN est défini, l'utiliser
     if (corsOrigin) {
       // Si plusieurs origines séparées par des virgules
@@ -102,13 +102,13 @@ async function bootstrap() {
   await app.listen(port, '0.0.0.0'); // Écouter sur toutes les interfaces pour Render
 
   console.log(`
-  ╔═══════════════════════════════════════════════════════════════╗
-  ║                                                                 ║
+  ╔════════════════════════════════════════════════════════════════╗
+  ║                                                                ║
   ║   🚀 Application démarrée avec succès !                        ║
-  ║                                                                 ║
+  ║                                                                ║
   ║   🌐 URL: http://localhost:${port}                             ║
   ║   📚 Swagger: http://localhost:${port}/api/docs                ║
-  ║   🔐 Version API: v1                                            ║
+  ║   🔐 Version API: v1                                           ║
   ║   🛡️  Environment: ${configService.get('NODE_ENV', 'development')}║
   ║                                                                 ║
   ╚═══════════════════════════════════════════════════════════════╝

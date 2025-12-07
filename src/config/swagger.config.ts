@@ -84,7 +84,6 @@ export function setupSwagger(app: INestApplication): void {
       'Abdou Aziz DIOP',
       'https://github.com/AbdouazizDEV',
       'abdouazizdiop583@gmail.com',
-      'https://www.linkedin.com/in/abdou-aziz-diop-b1aa05287',
     )
     .setLicense('MIT', 'https://opensource.org/licenses/MIT')
     .addTag('Auth', "Endpoints d'authentification (Login, Logout, Refresh)")
