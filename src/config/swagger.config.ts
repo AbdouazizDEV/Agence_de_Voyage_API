@@ -1,12 +1,42 @@
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 /**
  * Configuration Swagger - Documentation API interactive
  * Principe SOLID : Single Responsibility - Configure uniquement Swagger
  */
 export function setupSwagger(app: INestApplication): void {
-  const config = new DocumentBuilder()
+  const configService = app.get(ConfigService);
+  const nodeEnv = configService.get<string>('NODE_ENV', 'development');
+  
+  // Déterminer l'URL du serveur actuel
+  const getServerUrl = (): string => {
+    // En production, essayer de détecter l'URL depuis les variables d'environnement
+    const renderUrl = process.env.RENDER_EXTERNAL_URL;
+    const vercelUrl = process.env.VERCEL_URL;
+    const customUrl = process.env.API_URL;
+    
+    if (customUrl) {
+      return customUrl;
+    }
+    
+    if (renderUrl) {
+      return renderUrl;
+    }
+    
+    if (vercelUrl) {
+      return `https://${vercelUrl}`;
+    }
+    
+    // En développement, utiliser localhost
+    return 'http://localhost:3000';
+  };
+
+  const currentServerUrl = getServerUrl();
+  const isProduction = nodeEnv === 'production';
+
+  const documentBuilder = new DocumentBuilder()
     .setTitle('Travel Agency API')
     .setDescription(`
       # 🌍 API Plateforme Agence de Voyage
@@ -73,12 +103,22 @@ export function setupSwagger(app: INestApplication): void {
         in: 'header',
       },
       'JWT-auth',
-    )
-    .addServer('http://localhost:3000', 'Serveur de développement')
-    .addServer('https://agencedevoyageapi.netlify.app', 'Serveur Netlify')
-    .addServer('https://agence-de-voyage-api.onrender.com', 'Serveur Render')
-    .addServer('https://api.travel-agency.com', 'Serveur de production')
-    .build();
+    );
+
+  // Ajouter le serveur actuel en premier (sera sélectionné par défaut)
+  documentBuilder.addServer(currentServerUrl, isProduction ? 'Serveur de production (actuel)' : 'Serveur de développement (actuel)');
+  
+  // Ajouter les autres serveurs comme alternatives
+  if (isProduction) {
+    // En production, ajouter localhost comme alternative pour les tests locaux
+    documentBuilder.addServer('http://localhost:3000', 'Serveur local (pour tests)');
+  } else {
+    // En développement, ajouter les serveurs de production comme alternatives
+    documentBuilder.addServer('https://agence-de-voyage-api-1.onrender.com', 'Serveur Render');
+    documentBuilder.addServer('https://agencedevoyageapi.netlify.app', 'Serveur Netlify');
+  }
+
+  const config = documentBuilder.build();
 
   const document = SwaggerModule.createDocument(app, config, {
     deepScanRoutes: true,
@@ -96,6 +136,9 @@ export function setupSwagger(app: INestApplication): void {
         theme: 'monokai',
       },
       tryItOutEnabled: true,
+      // Sélectionner automatiquement le premier serveur (le serveur actuel)
+      defaultModelsExpandDepth: 1,
+      defaultModelExpandDepth: 1,
     },
     customSiteTitle: 'Travel Agency API Docs',
     customCss: `
@@ -106,6 +149,6 @@ export function setupSwagger(app: INestApplication): void {
     customfavIcon: '/favicon.ico',
   });
 
-  console.log('📚 Swagger documentation disponible sur: http://localhost:3000/api/docs');
+  console.log(`📚 Swagger documentation disponible sur: ${currentServerUrl}/api/docs`);
 }
 
