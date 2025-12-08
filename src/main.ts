@@ -30,35 +30,50 @@ async function bootstrap() {
     'http://localhost:3000',
     'http://localhost:5174',
     'https://agence-de-voyage-front.vercel.app',
+    'https://agence-de-voyage-front-tptc.vercel.app',
   ];
 
-  // Déterminer les origines autorisées
-  const allowedOrigins: string | boolean | string[] = (() => {
-    // En production, si CORS_ORIGIN est défini, l'utiliser
+  // Fonction pour vérifier si une origine est autorisée
+  // Supporte les patterns Vercel avec suffixes aléatoires
+  const originCallback = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    // Pas d'origine (requêtes same-origin, ex: Swagger)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Vérifier les origines par défaut
+    if (defaultOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // Vérifier les patterns Vercel (sous-domaines avec suffixes aléatoires)
+    const vercelPattern = /^https:\/\/.*\.vercel\.app$/;
+    if (vercelPattern.test(origin)) {
+      return callback(null, true);
+    }
+
+    // Vérifier les origines personnalisées depuis CORS_ORIGIN
     if (corsOrigin) {
-      // Si plusieurs origines séparées par des virgules
-      if (corsOrigin.includes(',')) {
-        const customOrigins = corsOrigin.split(',').map((origin) => origin.trim());
-        // Combiner avec les origines par défaut et dédupliquer
-        const allOrigins = [...defaultOrigins, ...customOrigins];
-        return [...new Set(allOrigins)]; // Supprimer les doublons
+      const customOrigins = corsOrigin.includes(',')
+        ? corsOrigin.split(',').map((o) => o.trim())
+        : [corsOrigin.trim()];
+      
+      if (customOrigins.includes(origin)) {
+        return callback(null, true);
       }
-      // Une seule origine personnalisée, combiner avec les défauts
-      return [...defaultOrigins, corsOrigin.trim()];
     }
 
-    // En développement, autoriser localhost et toutes les origines
+    // En développement, autoriser toutes les origines
     if (nodeEnv === 'development') {
-      return true; // Autoriser toutes les origines en dev
+      return callback(null, true);
     }
 
-    // En production sans CORS_ORIGIN, utiliser les origines par défaut
-    // Inclut automatiquement Netlify, Vercel, Render, et localhost
-    return defaultOrigins;
-  })();
+    // En production, refuser si non autorisée
+    callback(null, false);
+  };
 
   app.enableCors({
-    origin: allowedOrigins,
+    origin: originCallback,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
