@@ -23,15 +23,27 @@ async function bootstrap() {
   const corsOrigin = configService.get<string>('CORS_ORIGIN');
   const nodeEnv = configService.get<string>('NODE_ENV', 'development');
   
+  // Origines par défaut (Netlify, Vercel, Render, localhost)
+  const defaultOrigins = [
+    'https://agencedevoyagefront.netlify.app',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:5174',
+  ];
+
   // Déterminer les origines autorisées
   const allowedOrigins: string | boolean | string[] = (() => {
     // En production, si CORS_ORIGIN est défini, l'utiliser
     if (corsOrigin) {
       // Si plusieurs origines séparées par des virgules
       if (corsOrigin.includes(',')) {
-        return corsOrigin.split(',').map((origin) => origin.trim());
+        const customOrigins = corsOrigin.split(',').map((origin) => origin.trim());
+        // Combiner avec les origines par défaut et dédupliquer
+        const allOrigins = [...defaultOrigins, ...customOrigins];
+        return [...new Set(allOrigins)]; // Supprimer les doublons
       }
-      return corsOrigin;
+      // Une seule origine personnalisée, combiner avec les défauts
+      return [...defaultOrigins, corsOrigin.trim()];
     }
 
     // En développement, autoriser localhost et toutes les origines
@@ -39,9 +51,9 @@ async function bootstrap() {
       return true; // Autoriser toutes les origines en dev
     }
 
-    // En production sans CORS_ORIGIN, autoriser toutes les origines (pour Swagger)
-    // ⚠️ À ajuster selon vos besoins de sécurité
-    return true;
+    // En production sans CORS_ORIGIN, utiliser les origines par défaut
+    // Inclut automatiquement Netlify, Vercel, Render, et localhost
+    return defaultOrigins;
   })();
 
   app.enableCors({

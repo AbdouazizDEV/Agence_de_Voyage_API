@@ -7,6 +7,11 @@ Les erreurs CORS lors des tests avec Swagger ont été corrigées. La configurat
 - ✅ Requêtes depuis le même domaine (Swagger)
 - ✅ Headers supplémentaires pour Swagger
 - ✅ Gestion automatique développement/production
+- ✅ **Origines par défaut incluses automatiquement** :
+  - `https://agencedevoyagefront.netlify.app` (Frontend Netlify)
+  - `http://localhost:5173` (Vite dev server)
+  - `http://localhost:3000` (Local API)
+  - `http://localhost:5174` (Vite alt port)
 
 ## 📋 Configuration sur Render
 
@@ -29,13 +34,19 @@ CORS_ORIGIN=https://votre-frontend.com,https://agence-de-voyage-api-1.onrender.c
 
 **Exemple complet :**
 ```
-CORS_ORIGIN=https://mon-frontend.vercel.app,https://agence-de-voyage-api-1.onrender.com,http://localhost:5173
+CORS_ORIGIN=https://mon-frontend.vercel.app,https://agence-de-voyage-api-1.onrender.com
 ```
 
 **Origines autorisées :**
-1. Votre frontend (production)
-2. L'URL Render de l'API (pour Swagger)
-3. Localhost (pour développement local)
+1. **Origines par défaut** (automatiquement incluses) :
+   - `https://agencedevoyagefront.netlify.app`
+   - `http://localhost:5173`
+   - `http://localhost:3000`
+   - `http://localhost:5174`
+2. **Origines personnalisées** (ajoutées via `CORS_ORIGIN`) :
+   - Votre frontend (production)
+   - L'URL Render de l'API (pour Swagger)
+   - Autres domaines nécessaires
 
 ### Option 3 : Une seule origine
 
