@@ -56,8 +56,16 @@ export class AdminOffersQueryDto {
   })
   @IsOptional()
   @Transform(({ value }) => {
-    if (value === 'true' || value === true) return true;
-    if (value === 'false' || value === false) return false;
+    // Si la valeur n'est pas fournie, retourner undefined
+    if (value === undefined || value === null || value === '') {
+      return undefined;
+    }
+    // Gérer les chaînes 'true'/'false'
+    if (value === 'true' || value === '1') return true;
+    if (value === 'false' || value === '0') return false;
+    // Gérer les booléens déjà transformés
+    if (value === true || value === false) return value;
+    // Valeur invalide, retourner undefined
     return undefined;
   })
   @IsBoolean()
