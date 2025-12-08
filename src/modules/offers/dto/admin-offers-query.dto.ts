@@ -1,5 +1,5 @@
 import { IsOptional, IsInt, Min, Max, IsString, IsBoolean } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
@@ -50,12 +50,17 @@ export class AdminOffersQueryDto {
   category?: string;
 
   @ApiPropertyOptional({
-    description: 'Filtrer par statut actif/inactif',
+    description: 'Filtrer par statut actif/inactif (true pour actives, false pour inactives)',
     example: true,
     type: Boolean,
   })
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(({ value }) => {
+    if (value === 'true' || value === true) return true;
+    if (value === 'false' || value === false) return false;
+    return undefined;
+  })
+  @IsOptional()
   @IsBoolean()
   isActive?: boolean;
 }
