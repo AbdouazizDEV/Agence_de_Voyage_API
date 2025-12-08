@@ -22,9 +22,22 @@ export class OffersRepository {
     const { page = 1, limit = 12 } = pagination;
     const skip = (page - 1) * limit;
 
+    // Construire le filtre isActive de manière robuste
+    let isActiveFilter: boolean | undefined = undefined;
+    if (filters?.isActive !== undefined && filters?.isActive !== null) {
+      // Si c'est déjà un booléen, l'utiliser directement
+      if (typeof filters.isActive === 'boolean') {
+        isActiveFilter = filters.isActive;
+      }
+      // Si c'est une chaîne, la convertir
+      else if (typeof filters.isActive === 'string') {
+        isActiveFilter = filters.isActive === 'true' || filters.isActive === '1';
+      }
+    }
+
     const where: Prisma.OfferWhereInput = {
-      ...(filters?.isActive !== undefined
-        ? { is_active: filters.isActive }
+      ...(isActiveFilter !== undefined
+        ? { is_active: isActiveFilter }
         : { is_active: true }),
       ...(filters?.category && { category: filters.category }),
       ...(filters?.minPrice && { price: { gte: filters.minPrice } }),
