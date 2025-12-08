@@ -33,6 +33,7 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { ApiStandardResponse } from '../../common/decorators/api-response.decorator';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { AdminOffersQueryDto } from './dto/admin-offers-query.dto';
 
 /**
  * Contrôleur Offres Admin - Routes administrateur
@@ -53,26 +54,17 @@ export class OffersAdminController {
     description:
       'Récupère toutes les offres avec pagination et filtres (Admin)',
   })
-  @ApiQuery({ name: 'page', required: false, example: 1 })
-  @ApiQuery({ name: 'limit', required: false, example: 12 })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    description: 'Recherche textuelle',
-  })
-  @ApiQuery({ name: 'category', required: false })
-  @ApiQuery({ name: 'isActive', required: false, type: Boolean })
-  async findAll(
-    @Query() pagination: PaginationDto,
-    @Query('search') search?: string,
-    @Query('category') category?: string,
-    @Query('isActive') isActive?: boolean,
-  ) {
-    return this.offersService.findAll(pagination, {
-      search,
-      category,
-      isActive,
-    });
+  @ApiStandardResponse(OfferResponseDto, true)
+  async findAll(@Query() query: AdminOffersQueryDto) {
+    const { page, limit, search, category, isActive } = query;
+    return this.offersService.findAll(
+      { page, limit },
+      {
+        search,
+        category,
+        isActive,
+      },
+    );
   }
 
   @Post()
