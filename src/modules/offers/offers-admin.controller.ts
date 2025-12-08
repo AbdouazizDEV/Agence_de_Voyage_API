@@ -47,6 +47,53 @@ import { AdminOffersQueryDto } from './dto/admin-offers-query.dto';
 export class OffersAdminController {
   constructor(private readonly offersService: OffersService) {}
 
+  /**
+   * Normalise une date au format ISO-8601 complet pour Prisma
+   * Convertit les formats partiels (ex: "2025-12-21T03:25") en format complet (ex: "2025-12-21T03:25:00.000Z")
+   */
+  private normalizeDate(
+    dateString: string | undefined,
+  ): string | undefined {
+    if (!dateString) return undefined;
+
+    // Si la date est déjà au format ISO complet, la retourner telle quelle
+    if (dateString.includes('Z') || dateString.includes('+') || dateString.includes('-', 10)) {
+      // Vérifier si c'est déjà un format complet avec timezone
+      try {
+        new Date(dateString).toISOString();
+        return dateString;
+      } catch {
+        // Continuer pour normaliser
+      }
+    }
+
+    // Tenter de parser et reformater la date
+    try {
+      // Si la date n'a pas de timezone, ajouter 'Z' (UTC)
+      let dateToParse = dateString;
+      if (!dateString.includes('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
+        // Si la date est incomplète (ex: "2025-12-21T03:25"), compléter avec secondes et timezone
+        if (dateString.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/)) {
+          dateToParse = dateString + ':00.000Z';
+        } else if (dateString.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
+          dateToParse = dateString + '.000Z';
+        } else if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          dateToParse = dateString + 'T00:00:00.000Z';
+        } else {
+          dateToParse = dateString + 'Z';
+        }
+      }
+
+      const date = new Date(dateToParse);
+      if (isNaN(date.getTime())) {
+        return undefined; // Date invalide
+      }
+      return date.toISOString();
+    } catch {
+      return undefined;
+    }
+  }
+
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -143,6 +190,17 @@ export class OffersAdminController {
       } catch {
         parsedData.tags = [];
       }
+    }
+
+    // Normaliser les dates au format ISO-8601 complet
+    if (createDto.promotion_ends_at) {
+      parsedData.promotion_ends_at = this.normalizeDate(createDto.promotion_ends_at);
+    }
+    if (createDto.departure_date) {
+      parsedData.departure_date = this.normalizeDate(createDto.departure_date);
+    }
+    if (createDto.return_date) {
+      parsedData.return_date = this.normalizeDate(createDto.return_date);
     }
 
     return this.offersService.create(parsedData as CreateOfferDto, images);
@@ -281,6 +339,17 @@ export class OffersAdminController {
       } catch {
         delete parsedData.tags;
       }
+    }
+
+    // Normaliser les dates au format ISO-8601 complet
+    if (updateDto.promotion_ends_at) {
+      parsedData.promotion_ends_at = this.normalizeDate(updateDto.promotion_ends_at);
+    }
+    if (updateDto.departure_date) {
+      parsedData.departure_date = this.normalizeDate(updateDto.departure_date);
+    }
+    if (updateDto.return_date) {
+      parsedData.return_date = this.normalizeDate(updateDto.return_date);
     }
 
     // Extraire images_action pour le passer au service
