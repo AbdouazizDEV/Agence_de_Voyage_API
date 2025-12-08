@@ -29,6 +29,7 @@ async function bootstrap() {
     'http://localhost:5173',
     'http://localhost:3000',
     'http://localhost:5174',
+    'https://agence-de-voyage-front.vercel.app/',
   ];
 
   // Déterminer les origines autorisées
