@@ -56,12 +56,18 @@ export class OffersAdminController {
   ): string | undefined {
     if (!dateString) return undefined;
 
-    // Si la date est déjà au format ISO complet, la retourner telle quelle
-    if (dateString.includes('Z') || dateString.includes('+') || dateString.includes('-', 10)) {
-      // Vérifier si c'est déjà un format complet avec timezone
+    // Vérifier si la date est déjà au format ISO complet avec timezone
+    const hasTimezone = dateString.includes('Z') || 
+                       /[+-]\d{2}:?\d{2}$/.test(dateString) ||
+                       /[+-]\d{4}$/.test(dateString);
+    
+    if (hasTimezone) {
+      // Vérifier si c'est déjà un format complet valide
       try {
-        new Date(dateString).toISOString();
-        return dateString;
+        const date = new Date(dateString);
+        if (!isNaN(date.getTime())) {
+          return date.toISOString();
+        }
       } catch {
         // Continuer pour normaliser
       }
@@ -69,17 +75,28 @@ export class OffersAdminController {
 
     // Tenter de parser et reformater la date
     try {
-      // Si la date n'a pas de timezone, ajouter 'Z' (UTC)
       let dateToParse = dateString;
-      if (!dateString.includes('Z') && !dateString.includes('+') && !dateString.includes('-', 10)) {
-        // Si la date est incomplète (ex: "2025-12-21T03:25"), compléter avec secondes et timezone
+      
+      // Si la date n'a pas de timezone, la compléter selon son format
+      if (!hasTimezone) {
+        // Format: "YYYY-MM-DDTHH:mm" -> "YYYY-MM-DDTHH:mm:00.000Z"
         if (dateString.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/)) {
           dateToParse = dateString + ':00.000Z';
-        } else if (dateString.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
+        }
+        // Format: "YYYY-MM-DDTHH:mm:ss" -> "YYYY-MM-DDTHH:mm:ss.000Z"
+        else if (dateString.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)) {
           dateToParse = dateString + '.000Z';
-        } else if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        }
+        // Format: "YYYY-MM-DDTHH:mm:ss.sss" -> "YYYY-MM-DDTHH:mm:ss.sssZ"
+        else if (dateString.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}$/)) {
+          dateToParse = dateString + 'Z';
+        }
+        // Format: "YYYY-MM-DD" -> "YYYY-MM-DDT00:00:00.000Z"
+        else if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
           dateToParse = dateString + 'T00:00:00.000Z';
-        } else {
+        }
+        // Autre format, ajouter simplement 'Z'
+        else {
           dateToParse = dateString + 'Z';
         }
       }
