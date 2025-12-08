@@ -60,7 +60,6 @@ export class AdminOffersQueryDto {
     if (value === 'false' || value === false) return false;
     return undefined;
   })
-  @IsOptional()
   @IsBoolean()
   isActive?: boolean;
 }
